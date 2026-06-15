@@ -17,7 +17,7 @@ function LoginPage() {
       const res = await api.login(email, password);
       // store token
       localStorage.setItem("token", res.token);
-      navigate("/dashboard");
+      navigate("/home");
     } catch (err) {
       setError(err?.message || "Login failed");
     } finally {
@@ -66,11 +66,11 @@ function LoginPage() {
           </div>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-6">
+        <p className="text-center text-sm text-serene-muted mt-6">
           Don't have an account?{' '}
           <button
-            onClick={() => navigate('/login')}
-            className="text-indigo-600 font-medium"
+            onClick={() => navigate('/signup')}
+            className="text-serene-primary font-medium"
           >
             Sign up
           </button>

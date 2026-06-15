@@ -19,5 +19,12 @@
     "email": "alice@example.com",
     "password": "$2b$10$lwfG6lrhvF8NYXkx0mShdeI1.5a4IasKjiZb2AFVv2kPBdw7/dFSe",
     "createdAt": "2026-06-13T15:08:40.422Z"
+  },
+  {
+    "id": "1781515513437",
+    "name": "abc",
+    "email": "abc@gmail.com",
+    "password": "$2b$10$/9WvF8AKJlOPmWVvvjL8YeJfkjU8FF3ndz5NQBMPG1cbaxCxQfrku",
+    "createdAt": "2026-06-15T09:25:13.606Z"
   }
 ]

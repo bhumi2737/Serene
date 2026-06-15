@@ -17,7 +17,7 @@ function SignupPage() {
     try {
       const res = await api.register(name, email, password);
       localStorage.setItem("token", res.token);
-      navigate("/dashboard");
+      navigate("/home");
     } catch (err) {
       setError(err?.message || "Signup failed");
     } finally {
@@ -27,12 +27,12 @@ function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-10">
+      <div className="max-w-md w-full bg-white rounded-2xl border border-serene-border p-10">
         <h2 className="text-2xl font-semibold mb-6 text-center">Create Account 🌿</h2>
 
         <form onSubmit={handleSignup} className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Name</label>
+            <label className="block text-sm text-serene-brown mb-1">Name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -42,7 +42,7 @@ function SignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Email</label>
+            <label className="block text-sm text-serene-brown mb-1">Email</label>
             <input
               type="email"
               value={email}
@@ -53,7 +53,7 @@ function SignupPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Password</label>
+            <label className="block text-sm text-serene-brown mb-1">Password</label>
             <input
               type="password"
               value={password}
@@ -69,7 +69,7 @@ function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white px-4 py-3 rounded-xl text-base font-medium hover:bg-indigo-700 transition disabled:opacity-50"
+              className="w-full bg-serene-primary text-white px-4 py-3 rounded-xl text-base font-medium disabled:opacity-50"
             >
               {loading ? "Creating..." : "Create account"}
             </button>

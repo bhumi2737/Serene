@@ -41,13 +41,13 @@ function LandingPage() {
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => navigate("/")}
-                className="bg-indigo-600 text-white px-6 py-3 rounded-xl text-base font-medium hover:bg-indigo-700 transition"
+                className="bg-serene-primary text-white px-6 py-3 rounded-xl text-base font-medium"
               >
                 Home
               </button>
               <button
                 onClick={handleLogout}
-                className="border border-indigo-600 text-indigo-600 px-6 py-3 rounded-xl text-base font-medium hover:bg-indigo-50 transition"
+                className="border border-serene-border text-serene-primary px-6 py-3 rounded-xl text-base font-medium"
               >
                 Logout
               </button>
@@ -56,15 +56,15 @@ function LandingPage() {
         ) : (
           <div className="flex justify-center gap-4">
             <button
-              onClick={() => navigate("/login")}
-              className="bg-indigo-600 text-white px-6 py-3 rounded-xl text-base font-medium hover:bg-indigo-700 transition"
+              onClick={() => navigate("/signup")}
+              className="bg-serene-primary text-white px-6 py-3 rounded-xl text-base font-medium"
             >
               Get Started
             </button>
 
             <button
               onClick={() => navigate("/login")}
-              className="border border-indigo-600 text-indigo-600 px-6 py-3 rounded-xl text-base font-medium hover:bg-indigo-50 transition"
+              className="border border-serene-border text-serene-primary px-6 py-3 rounded-xl text-base font-medium"
             >
               Login
             </button>
