@@ -171,16 +171,6 @@ cd server
 npm install
 ```
 
-### 3. Install frontend dependencies
-
-```bash
-cd ../client
-npm install
-```
-
----
-
-
 ## 🌍 Deployment Plan
 
 | Part     | Platform      |
