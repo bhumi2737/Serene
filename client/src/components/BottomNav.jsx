@@ -33,7 +33,7 @@ const IconProfile = () => (
 
 const navItems = [
   { label: "Home", path: "/home", icon: <IconHome /> },
-  { label: "Insights", path: "/insights", icon: <IconInsights /> },
+  { label: "Insights", path: "/mood", icon: <IconInsights /> },
   { label: "Journal", path: "/journal", icon: <IconJournal /> },
   { label: "Profile", path: "/profile", icon: <IconProfile /> },
 ];
