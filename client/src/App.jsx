@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import MoodPage from "./pages/MoodPage";
 import Dashboard from "./pages/Dashboard";
 import JournalPage from "./pages/JournalPage";
+import ChatPage from "./pages/ChatPage";
 import RequireAuth from "./components/RequireAuth";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/chat" element={<ChatPage />} />
         <Route path="/journal" element={<JournalPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
