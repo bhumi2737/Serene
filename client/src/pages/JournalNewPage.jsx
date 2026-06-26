@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
 
 function JournalNewPage() {
   const navigate = useNavigate();
@@ -34,105 +35,98 @@ function JournalNewPage() {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "390px",
-        margin: "0 auto",
-        minHeight: "100vh",
-        backgroundColor: "#FAFAF8",
-        padding: "24px 16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-      }}
-    >
-      {/* ── HEADER ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        {/* Back button */}
-        <button
-          onClick={() => navigate("/journal")}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            color: "#B0A99F",
-            fontSize: "13px",
-            padding: 0,
-          }}
-        >
-          <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          Back
-        </button>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#FAFAF8" }}>
+      <Sidebar />
+      <div style={{ marginLeft: "240px", flex: 1, padding: "48px 64px", maxWidth: "860px" }}>
+        {/* ── HEADER ── */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {/* Back button */}
+          <button
+            onClick={() => navigate("/journal")}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              color: "#B0A99F",
+              fontSize: "13px",
+              padding: 0,
+            }}
+          >
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Back
+          </button>
 
-        {/* Save button */}
-        <button
-          onClick={handleSave}
-          disabled={!text.trim()}
+          {/* Save button */}
+          <button
+            onClick={handleSave}
+            disabled={!text.trim()}
+            style={{
+              backgroundColor: text.trim() ? "#1C1917" : "#E8E4DF",
+              color: text.trim() ? "#ffffff" : "#B0A99F",
+              border: "none",
+              borderRadius: "8px",
+              padding: "6px 14px",
+              fontSize: "12px",
+              fontWeight: "500",
+              cursor: text.trim() ? "pointer" : "not-allowed",
+            }}
+          >
+            {saved ? "Saved ✓" : "Save"}
+          </button>
+        </div>
+
+        {/* ── DATE ── */}
+        <p style={{ fontSize: "11px", color: "#B0A99F", marginTop: "16px" }}>
+          {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+        </p>
+
+        {/* ── TITLE INPUT ── */}
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title (optional)"
           style={{
-            backgroundColor: text.trim() ? "#1C1917" : "#E8E4DF",
-            color: text.trim() ? "#ffffff" : "#B0A99F",
+            backgroundColor: "transparent",
             border: "none",
-            borderRadius: "8px",
-            padding: "6px 14px",
-            fontSize: "12px",
+            borderBottom: "1px solid #E8E4DF",
+            padding: "8px 0",
+            fontSize: "16px",
             fontWeight: "500",
-            cursor: text.trim() ? "pointer" : "not-allowed",
+            color: "#1C1917",
+            outline: "none",
+            fontFamily: "inherit",
+            width: "100%",
+            marginTop: "24px",
+            marginBottom: "16px",
           }}
-        >
-          {saved ? "Saved ✓" : "Save"}
-        </button>
+        />
+
+        {/* ── BODY TEXTAREA ── */}
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Write freely..."
+          style={{
+            minHeight: "60vh",
+            backgroundColor: "transparent",
+            border: "none",
+            padding: "8px 0",
+            fontSize: "14px",
+            color: "#1C1917",
+            lineHeight: "1.8",
+            resize: "none",
+            outline: "none",
+            fontFamily: "inherit",
+            width: "100%",
+          }}
+        />
       </div>
-
-      {/* ── DATE ── */}
-      <p style={{ fontSize: "11px", color: "#B0A99F" }}>
-        {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-      </p>
-
-      {/* ── TITLE INPUT ── */}
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Title (optional)"
-        style={{
-          backgroundColor: "transparent",
-          border: "none",
-          borderBottom: "1px solid #E8E4DF",
-          padding: "8px 0",
-          fontSize: "16px",
-          fontWeight: "500",
-          color: "#1C1917",
-          outline: "none",
-          fontFamily: "inherit",
-          width: "100%",
-        }}
-      />
-
-      {/* ── BODY TEXTAREA ── */}
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Write freely..."
-        style={{
-          flex: 1,
-          minHeight: "60vh",
-          backgroundColor: "transparent",
-          border: "none",
-          padding: "8px 0",
-          fontSize: "14px",
-          color: "#1C1917",
-          lineHeight: "1.8",
-          resize: "none",
-          outline: "none",
-          fontFamily: "inherit",
-          width: "100%",
-        }}
-      />
     </div>
   );
 }

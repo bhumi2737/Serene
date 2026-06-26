@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import BottomNav from "../components/BottomNav";
+import Sidebar from "../components/Sidebar";
 
 // Mood options with emoji, label, and a subtle color for the history dots
 const moods = [
@@ -35,8 +35,9 @@ function MoodPage() {
   };
 
   return (
-    <div style={{ background: '#FAFAF8', minHeight: '100vh', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ width: 390, maxWidth: '100%', paddingBottom: 96 }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#FAFAF8" }}>
+      <Sidebar />
+      <div style={{ marginLeft: "240px", flex: 1, padding: "48px 64px", maxWidth: "860px" }}>
 
         {/* ── PAGE HEADER ── */}
         <div style={{ padding: 16 }}>
@@ -191,7 +192,6 @@ function MoodPage() {
           </div>
         </div>
 
-      <BottomNav />
       </div>
     </div>
   );

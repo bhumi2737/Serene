@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import BottomNav from "../components/BottomNav";
+import Sidebar from "../components/Sidebar";
 
 // Emotion tag colors
 const emotionStyles = {
@@ -58,116 +58,106 @@ function JournalPage() {
   }, []);
 
   return (
-    <div
-      style={{
-        maxWidth: "390px",
-        margin: "0 auto",
-        minHeight: "100vh",
-        backgroundColor: "#FAFAF8",
-        padding: "24px 16px 100px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "12px",
-      }}
-    >
-      {/* ── HEADER ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1 style={{ fontSize: "18px", fontWeight: "500", color: "#1C1917" }}>Journal</h1>
-        <button
-          onClick={() => navigate("/journal/new")}
-          style={{
-            backgroundColor: "#1C1917",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: "8px",
-            padding: "6px 14px",
-            fontSize: "12px",
-            fontWeight: "500",
-            cursor: "pointer",
-          }}
-        >
-          Write
-        </button>
-      </div>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#FAFAF8" }}>
+      <Sidebar />
+      <div style={{ marginLeft: "240px", flex: 1, padding: "48px 64px", maxWidth: "860px" }}>
+        {/* ── HEADER ── */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h1 style={{ fontSize: "18px", fontWeight: "500", color: "#1C1917" }}>Journal</h1>
+          <button
+            onClick={() => navigate("/journal/new")}
+            style={{
+              backgroundColor: "#1C1917",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "6px 14px",
+              fontSize: "12px",
+              fontWeight: "500",
+              cursor: "pointer",
+            }}
+          >
+            Write
+          </button>
+        </div>
 
-      {/* ── DATE LABEL ── */}
-      <p style={{ fontSize: "11px", color: "#B0A99F" }}>
-        {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-      </p>
+        {/* ── DATE LABEL ── */}
+        <p style={{ fontSize: "11px", color: "#B0A99F" }}>
+          {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+        </p>
 
-      {/* ── ENTRY CARDS ── */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        {entries.map((entry) => {
-          const tagStyle = emotionStyles[entry.emotion] || emotionStyles["Calm"];
-          return (
-            <div
-              key={entry.id}
-              style={{
-                backgroundColor: "#ffffff",
-                borderRadius: "16px",
-                border: "1px solid #E8E4DF",
-                padding: "14px 16px",
-              }}
-            >
-              {/* Top row */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                <p style={{ fontSize: "13px", fontWeight: "500", color: "#1C1917" }}>{entry.title}</p>
-                <span
-                  style={{
-                    fontSize: "10px",
-                    padding: "3px 8px",
-                    borderRadius: "6px",
-                    fontWeight: "500",
-                    backgroundColor: tagStyle.background,
-                    color: tagStyle.color,
-                  }}
-                >
-                  {entry.emotion}
-                </span>
-              </div>
-
-              {/* Preview */}
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "#6B6460",
-                  lineHeight: "1.6",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {entry.preview}
-              </p>
-
-              {/* Bottom row */}
+        {/* ── ENTRY CARDS ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {entries.map((entry) => {
+            const tagStyle = emotionStyles[entry.emotion] || emotionStyles["Calm"];
+            return (
               <div
+                key={entry.id}
                 style={{
-                  marginTop: "10px",
-                  paddingTop: "10px",
-                  borderTop: "1px solid #E8E4DF",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  backgroundColor: "#ffffff",
+                  borderRadius: "16px",
+                  border: "1px solid #E8E4DF",
+                  padding: "14px 16px",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                  <svg width="12" height="12" fill="none" stroke="#B0A99F" strokeWidth="1.8" viewBox="0 0 24 24">
-                    <path d="M9.5 2a7.5 7.5 0 100 15 7.5 7.5 0 000-15z" />
-                    <path d="M21 21l-4.35-4.35" />
-                  </svg>
-                  <span style={{ fontSize: "11px", color: "#B0A99F" }}>
-                    AI: {entry.aiDetected}
+                {/* Top row */}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                  <p style={{ fontSize: "13px", fontWeight: "500", color: "#1C1917" }}>{entry.title}</p>
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      padding: "3px 8px",
+                      borderRadius: "6px",
+                      fontWeight: "500",
+                      backgroundColor: tagStyle.background,
+                      color: tagStyle.color,
+                    }}
+                  >
+                    {entry.emotion}
                   </span>
                 </div>
-                <span style={{ fontSize: "10px", color: "#B0A99F" }}>{entry.time}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
 
-      <BottomNav />
+                {/* Preview */}
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#6B6460",
+                    lineHeight: "1.6",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {entry.preview}
+                </p>
+
+                {/* Bottom row */}
+                <div
+                  style={{
+                    marginTop: "10px",
+                    paddingTop: "10px",
+                    borderTop: "1px solid #E8E4DF",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    <svg width="12" height="12" fill="none" stroke="#B0A99F" strokeWidth="1.8" viewBox="0 0 24 24">
+                      <path d="M9.5 2a7.5 7.5 0 100 15 7.5 7.5 0 000-15z" />
+                      <path d="M21 21l-4.35-4.35" />
+                    </svg>
+                    <span style={{ fontSize: "11px", color: "#B0A99F" }}>
+                      AI: {entry.aiDetected}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: "10px", color: "#B0A99F" }}>{entry.time}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

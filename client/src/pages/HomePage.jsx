@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BottomNav from "../components/BottomNav";
+import Sidebar from "../components/Sidebar";
 
 const moods = [
   { emoji: "😔", label: "Low" },
@@ -18,8 +18,9 @@ function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ background: '#FAFAF8', minHeight: '100vh', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ width: 390, maxWidth: '100%', paddingBottom: 96 }}>
+    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#FAFAF8" }}>
+      <Sidebar />
+      <div style={{ marginLeft: "240px", flex: 1, padding: "48px 64px", maxWidth: "860px" }}>
         {/* Header */}
         <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -155,10 +156,7 @@ function HomePage() {
             </div>
           </button>
         </div>
-
       </div>
-
-      <BottomNav />
     </div>
   );
 }
