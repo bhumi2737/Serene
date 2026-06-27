@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
+import AppShell from "../components/AppShell";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import StatItem from "../components/StatItem";
+import { BookOpen, Heart, MessageSquare, Plus, Check } from "lucide-react";
 
-function Home() {
+const moods = [
+  { emoji: "😔", label: "Low" },
+  { emoji: "😐", label: "Okay" },
+  { emoji: "😊", label: "Good" },
+  { emoji: "😄", label: "Great" },
+  { emoji: "🤩", label: "Amazing" },
+];
+
+export default function Home() {
   const navigate = useNavigate();
-  const [hoveredBtn, setHoveredBtn] = useState(null);
-  const [hoveredStat, setHoveredStat] = useState(null);
+  const [userName, setUserName] = useState("Bhumi");
+  const [selectedMood, setSelectedMood] = useState(null);
+  const [moodSaved, setMoodSaved] = useState(false);
+
+  useEffect(() => {
+    const name = localStorage.getItem("userName");
+    if (name) setUserName(name);
+  }, []);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -14,231 +32,214 @@ function Home() {
     return "Good evening";
   };
 
-  const todayDate = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric'
-  });
+  const handleMoodSelect = (index) => {
+    setSelectedMood(index);
+    setMoodSaved(true);
+  };
 
-  const stats = [
-    { emoji: "📊", value: "7/10", label: "Mood Score" },
-    { emoji: "📓", value: "3", label: "Journal Entries" },
-    { emoji: "🌸", value: "5", label: "Gratitude Logs" },
-    { emoji: "🔥", value: "10", label: "Day Streak" },
-  ];
-
-  const quickActions = [
-    { label: "Log Mood", emoji: "😊", path: "/mood", color: "#7C3AED", rgb: "124, 58, 237" },
-    { label: "Write in Journal", emoji: "✍️", path: "/journal", color: "#0D9488", rgb: "13, 148, 136" },
-    { label: "Add Gratitude", emoji: "🙏", path: "/gratitude", color: "#F97316", rgb: "249, 115, 22" },
-    { label: "Chat with AI", emoji: "💬", path: "/chat", color: "#A78BFA", rgb: "167, 139, 250" },
-  ];
+  const getNextAction = (moodIdx) => {
+    if (moodIdx === 0 || moodIdx === 1) {
+      return {
+        text: "Sharing your thoughts can bring relief. Would you like to write in your journal or chat with our companion?",
+        primaryText: "Write a Journal Entry",
+        primaryPath: "/journal",
+        secondaryText: "Talk to Companion",
+        secondaryPath: "/chat",
+      };
+    } else {
+      return {
+        text: "We are glad you are feeling well. Take a moment to write down what you are grateful for today.",
+        primaryText: "Record Gratitude",
+        primaryPath: "/gratitude",
+        secondaryText: "Write in Journal",
+        secondaryPath: "/journal",
+      };
+    }
+  };
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", backgroundColor: "#0F0E17", position: "relative" }}>
-      {/* Ambient Pulsing Glows */}
-      <div style={{
-        position: "absolute",
-        top: "5%",
-        left: "25%",
-        width: "500px",
-        height: "500px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, rgba(0,0,0,0) 70%)",
-        pointerEvents: "none",
-        zIndex: 0,
-        animation: "pulseGlow 12s ease-in-out infinite",
-      }} />
-      <div style={{
-        position: "absolute",
-        bottom: "10%",
-        right: "5%",
-        width: "600px",
-        height: "600px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(13, 148, 136, 0.05) 0%, rgba(0,0,0,0) 70%)",
-        pointerEvents: "none",
-        zIndex: 0,
-        animation: "pulseGlow 15s ease-in-out infinite 2s",
-      }} />
-
-      <Sidebar />
-      <div
-        style={{
-          marginLeft: "240px",
-          flex: 1,
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        {/* Scrollable Container stretched to full desktop width */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "40px 60px",
-            width: "100%",
-            boxSizing: "border-box",
-          }}
-        >
-          {/* Hero Greeting Card */}
-          <div
-            style={{
-              background: "linear-gradient(135deg, rgba(124, 58, 237, 0.22) 0%, rgba(13, 148, 136, 0.12) 100%)",
-              border: "1px solid rgba(124, 58, 237, 0.3)",
-              borderRadius: "24px",
-              padding: "36px 48px",
-              marginBottom: "36px",
-              backdropFilter: "blur(8px)",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: "40px",
-              animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-            }}
-          >
-            <div>
-              <div style={{ color: "#94A3B8", fontSize: "14px", marginBottom: "8px", fontWeight: "500" }}>
-                {todayDate}
-              </div>
-              <h1 style={{ color: "#FFFFFF", fontSize: "38px", fontWeight: "800", margin: "0 0 8px 0", letterSpacing: "-0.03em" }}>
-                {getGreeting()}, Bhumi 👋
-              </h1>
-              <p style={{ color: "#A78BFA", fontSize: "17px", margin: 0, fontWeight: "500" }}>
-                How are you feeling today? Take a moment for yourself.
-              </p>
-            </div>
-
-            {/* Vector Illustration (Sunset hills & calm ocean wave) */}
-            <div style={{ animation: "float 6s ease-in-out infinite", flexShrink: 0, display: "block" }}>
-              <svg width="240" height="150" viewBox="0 0 240 150" fill="none">
-                <circle cx="120" cy="75" r="40" fill="url(#sunGradient)" />
-                <path d="M10 130 C 60 70, 90 100, 140 60 C 190 100, 200 90, 230 130 Z" fill="rgba(124, 58, 237, 0.22)" stroke="rgba(124, 58, 237, 0.4)" strokeWidth="1.5" />
-                <path d="M30 130 C 80 90, 110 110, 160 80 C 200 110, 210 105, 240 130 Z" fill="rgba(13, 148, 136, 0.18)" stroke="rgba(13, 148, 136, 0.3)" strokeWidth="1.5" />
-                <path d="M0 125 Q 60 120, 120 125 T 240 125 L 240 150 L 0 150 Z" fill="#1A1A2E" opacity="0.9"/>
-                <circle cx="50" cy="40" r="1.5" fill="#FFFFFF" opacity="0.6" />
-                <circle cx="180" cy="30" r="2" fill="#FFFFFF" opacity="0.8" />
-                <circle cx="210" cy="55" r="1.2" fill="#FFFFFF" opacity="0.4" />
-                <defs>
-                  <radialGradient id="sunGradient" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#F97316" stopOpacity="0.75" />
-                    <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
-                  </radialGradient>
-                </defs>
-              </svg>
-            </div>
-          </div>
-
-          {/* Today at a Glance */}
-          <h2 style={{
-            color: "#E2E8F0",
-            fontSize: "14px",
-            fontWeight: "700",
-            margin: "0 0 16px 0",
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
-            opacity: 0,
-          }}>
-            Today at a glance
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "20px",
-              marginBottom: "36px",
-              animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards",
-              opacity: 0,
-            }}
-          >
-            {stats.map((stat, i) => {
-              const isHovered = hoveredStat === i;
-              return (
-                <div
-                  key={i}
-                  onMouseEnter={() => setHoveredStat(i)}
-                  onMouseLeave={() => setHoveredStat(null)}
-                  style={{
-                    backgroundColor: "rgba(26, 26, 46, 0.6)",
-                    border: isHovered ? "1px solid rgba(124, 58, 237, 0.3)" : "1px solid rgba(255, 255, 255, 0.08)",
-                    borderRadius: "20px",
-                    padding: "24px",
-                    textAlign: "center",
-                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                    transform: isHovered ? "translateY(-6px)" : "translateY(0)",
-                    backdropFilter: "blur(12px)",
-                  }}
-                >
-                  <div style={{ fontSize: "36px", marginBottom: "8px" }}>{stat.emoji}</div>
-                  <div style={{ color: "#FFFFFF", fontSize: "28px", fontWeight: "800", marginBottom: "4px" }}>
-                    {stat.value}
-                  </div>
-                  <div style={{ color: "#94A3B8", fontSize: "12px", fontWeight: "600" }}>{stat.label}</div>
-                </div>
-              );
+    <AppShell>
+      {/* ── GREETING HERO ── */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-serene-border mb-8">
+        <div>
+          <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
             })}
-          </div>
+          </span>
+          <h1 className="text-3xl font-bold text-serene-primary font-serif mt-1">
+            {getGreeting()}, {userName}
+          </h1>
+          <p className="text-sm text-serene-muted mt-1">
+            A quiet space to understand how you feel.
+          </p>
+        </div>
 
-          {/* Quick Actions */}
-          <h2 style={{
-            color: "#E2E8F0",
-            fontSize: "14px",
-            fontWeight: "700",
-            margin: "0 0 16px 0",
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards",
-            opacity: 0,
-          }}>
-            Quick actions
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
-              gap: "20px",
-              animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards",
-              opacity: 0,
-            }}
-          >
-            {quickActions.map((action, i) => {
-              const isHovered = hoveredBtn === i;
-              return (
-                <button
-                  key={i}
-                  onClick={() => navigate(action.path)}
-                  onMouseEnter={() => setHoveredBtn(i)}
-                  onMouseLeave={() => setHoveredBtn(null)}
-                  style={{
-                    backgroundColor: isHovered ? `rgba(${action.rgb}, 0.15)` : "rgba(26, 26, 46, 0.6)",
-                    border: `1px solid ${isHovered ? action.color : "rgba(255, 255, 255, 0.08)"}`,
-                    borderRadius: "20px",
-                    padding: "32px 20px",
-                    textAlign: "center",
-                    cursor: "pointer",
-                    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                    transform: isHovered ? "translateY(-6px) scale(1.02)" : "translateY(0) scale(1)",
-                    outline: "none",
-                    backdropFilter: "blur(12px)",
-                  }}
-                >
-                  <div style={{ fontSize: "40px", marginBottom: "12px" }}>{action.emoji}</div>
-                  <div style={{ color: "#E2E8F0", fontSize: "14px", fontWeight: "700", letterSpacing: "-0.01em" }}>
-                    {action.label}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+        {/* Minimalist Botanical SVG Graphic */}
+        <div className="flex-shrink-0 opacity-80">
+          <svg width="120" height="90" viewBox="0 0 120 120" fill="none">
+            <path
+              d="M60 110 C 60 110, 40 70, 45 40 C 47 30, 55 15, 60 10 C 65 15, 73 30, 75 40 C 80 70, 60 110, 60 110 Z"
+              fill="rgba(35, 68, 59, 0.08)"
+              stroke="#23443B"
+              strokeWidth="1.2"
+            />
+            <path
+              d="M60 110 C 60 110, 80 80, 85 65 C 88 55, 92 45, 90 40 C 85 40, 78 48, 70 58 Z"
+              fill="rgba(35, 68, 59, 0.04)"
+              stroke="#23443B"
+              strokeWidth="0.8"
+            />
+            <path
+              d="M60 110 C 60 110, 40 80, 35 65 C 32 55, 28 45, 30 40 C 35 40, 42 48, 50 58 Z"
+              fill="rgba(35, 68, 59, 0.04)"
+              stroke="#23443B"
+              strokeWidth="0.8"
+            />
+            <circle cx="60" cy="10" r="2.5" fill="#E78B78" />
+            <circle cx="90" cy="40" r="2.5" fill="#E78B78" />
+            <circle cx="30" cy="40" r="2.5" fill="#E78B78" />
+          </svg>
         </div>
       </div>
-    </div>
+
+      {/* ── MAIN ACTIONS / SPLIT LAYOUT ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Left Side: Mood Logger Card (Primary Action) */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          <Card className="border-serene-border relative overflow-hidden">
+            <h2 className="text-lg font-bold text-serene-primary font-serif mb-2">How are you feeling today?</h2>
+            <p className="text-sm text-serene-muted mb-6">Select a mood option to record your daily check-in.</p>
+
+            <div className="grid grid-cols-5 gap-2 md:gap-4">
+              {moods.map((mood, idx) => {
+                const isSelected = selectedMood === idx;
+                return (
+                  <button
+                    key={mood.label}
+                    onClick={() => handleMoodSelect(idx)}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
+                      isSelected
+                        ? "border-serene-primary bg-serene-primarySoft text-serene-primary font-semibold"
+                        : "border-serene-border bg-serene-surface text-serene-text hover:border-serene-muted"
+                    }`}
+                  >
+                    <span className="text-2xl md:text-3xl mb-1">{mood.emoji}</span>
+                    <span className="text-[11px] tracking-wide">{mood.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Next Recommended Action */}
+            {moodSaved && selectedMood !== null && (
+              <div className="mt-6 p-4 bg-serene-bg border border-serene-border rounded-lg animate-fade-in">
+                <div className="flex items-center gap-2 text-serene-primary font-medium text-sm mb-1.5">
+                  <Check className="w-4 h-4 text-serene-primary" />
+                  <span>Check-in saved</span>
+                </div>
+                <p className="text-xs text-serene-muted leading-relaxed mb-4">
+                  {getNextAction(selectedMood).text}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => navigate(getNextAction(selectedMood).primaryPath)}
+                  >
+                    {getNextAction(selectedMood).primaryText}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate(getNextAction(selectedMood).secondaryPath)}
+                  >
+                    {getNextAction(selectedMood).secondaryText}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Card>
+
+          {/* Secondary Actions: Quick Activity List */}
+          <div>
+            <h3 className="text-sm font-semibold text-serene-muted uppercase tracking-wider mb-3">Other ways to check in</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card
+                onClick={() => navigate("/journal")}
+                className="p-5 flex items-start gap-3 hover:border-serene-primary/30 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-lg bg-serene-primarySoft flex items-center justify-center text-serene-primary flex-shrink-0">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-serene-primary">Journal</h4>
+                  <p className="text-xs text-serene-muted mt-1 leading-relaxed">Distraction-free personal entries</p>
+                </div>
+              </Card>
+
+              <Card
+                onClick={() => navigate("/gratitude")}
+                className="p-5 flex items-start gap-3 hover:border-serene-primary/30 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-lg bg-serene-primarySoft flex items-center justify-center text-serene-primary flex-shrink-0">
+                  <Heart className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-serene-primary">Gratitude</h4>
+                  <p className="text-xs text-serene-muted mt-1 leading-relaxed">Log items you are thankful for</p>
+                </div>
+              </Card>
+
+              <Card
+                onClick={() => navigate("/chat")}
+                className="p-5 flex items-start gap-3 hover:border-serene-primary/30 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-lg bg-serene-primarySoft flex items-center justify-center text-serene-primary flex-shrink-0">
+                  <MessageSquare className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-serene-primary">Companion</h4>
+                  <p className="text-xs text-serene-muted mt-1 leading-relaxed">Gentle prompts & chat companion</p>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Demo Statistics Row (Compact list layout) */}
+        <div className="flex flex-col gap-6">
+          <div>
+            <h3 className="text-sm font-semibold text-serene-muted uppercase tracking-wider mb-3">Weekly Summary</h3>
+            <div className="flex flex-col gap-3">
+              <StatItem
+                value="😊 Good"
+                label="Average mood this week"
+                subtext="Based on past 7 days (demo data)"
+              />
+              <StatItem
+                value="3 entries"
+                label="Journal Logs"
+                subtext="This week (demo data)"
+              />
+              <StatItem
+                value="5 logs"
+                label="Gratitude Check-ins"
+                subtext="This week (demo data)"
+              />
+              <StatItem
+                value="10 days"
+                label="Active Streak"
+                subtext="Consistent check-ins (demo data)"
+              />
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </AppShell>
   );
 }
-
-export default Home;

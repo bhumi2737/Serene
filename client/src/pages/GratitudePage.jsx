@@ -1,18 +1,42 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
+import React, { useState, useEffect } from "react";
+import AppShell from "../components/AppShell";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import PageHeader from "../components/PageHeader";
+import EmptyState from "../components/EmptyState";
+import { Heart, Check, Calendar } from "lucide-react";
 
-function GratitudePage() {
+export default function GratitudePage() {
   const [inputs, setInputs] = useState(["", "", ""]);
   const [saved, setSaved] = useState(false);
   const [pastEntries, setPastEntries] = useState([]);
   const [focusedInput, setFocusedInput] = useState(null);
 
-  // Load past entries from localStorage when page loads
   useEffect(() => {
     const stored = localStorage.getItem("serene_gratitude");
     if (stored) {
       setPastEntries(JSON.parse(stored));
+    } else {
+      // Default placeholder logs for demonstration
+      const defaults = [
+        {
+          date: "Yesterday",
+          items: [
+            "Had a warm cup of herbal tea in the morning.",
+            "A nice conversation with an old friend.",
+            "Completed my project milestones ahead of schedule."
+          ]
+        },
+        {
+          date: "Last Wednesday",
+          items: [
+            "The weather was calm and sunny.",
+            "Read a helpful article on mindfulness."
+          ]
+        }
+      ];
+      setPastEntries(defaults);
+      localStorage.setItem("serene_gratitude", JSON.stringify(defaults));
     }
   }, []);
 
@@ -27,7 +51,6 @@ function GratitudePage() {
   const handleSave = () => {
     if (!hasContent) return;
 
-    // Build today's entry
     const today = new Date().toLocaleDateString("en-US", {
       weekday: "long",
       month: "short",
@@ -39,12 +62,10 @@ function GratitudePage() {
       items: inputs.filter((val) => val.trim() !== ""),
     };
 
-    // Add to top of list and save to localStorage
     const updated = [newEntry, ...pastEntries];
     setPastEntries(updated);
     localStorage.setItem("serene_gratitude", JSON.stringify(updated));
 
-    // Reset inputs and show confirmation
     setInputs(["", "", ""]);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -57,112 +78,45 @@ function GratitudePage() {
   });
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", backgroundColor: "#0F0E17", position: "relative" }}>
-      {/* Ambient Pulsing Glows */}
-      <div style={{
-        position: "absolute",
-        top: "10%",
-        left: "30%",
-        width: "500px",
-        height: "500px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, rgba(0,0,0,0) 70%)",
-        pointerEvents: "none",
-        zIndex: 0,
-        animation: "pulseGlow 12s ease-in-out infinite",
-      }} />
+    <AppShell>
+      {/* ── PAGE HEADER ── */}
+      <PageHeader
+        title="Gratitude Journal"
+        subtitle="Slow down and write down small things that bring you comfort"
+      />
 
-      <Sidebar />
-      <div
-        style={{
-          marginLeft: "240px",
-          flex: 1,
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "40px 60px",
-            width: "100%",
-            boxSizing: "border-box",
-          }}
-        >
-          {/* ── PAGE HEADER ── */}
-          <div style={{ marginBottom: "24px", animation: "fadeInUp 0.5s ease forwards" }}>
-            <h1 style={{ fontSize: "22px", fontWeight: "700", color: "#E2E8F0", letterSpacing: "-0.02em" }}>
-              Gratitude
-            </h1>
-            <p style={{ fontSize: "13px", color: "#94A3B8", marginTop: "4px" }}>
-              What are you grateful for today?
+      {/* ── DUAL COLUMN GRID LAYOUT ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        {/* Column 1: Today's check-in */}
+        <div className="flex flex-col gap-4 animate-fade-in-up">
+          <Card className="border-serene-border">
+            <div className="flex items-center gap-2 mb-4">
+              <Heart className="w-4 h-4 text-serene-accent" />
+              <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider">
+                {formattedToday} Check-in
+              </span>
+            </div>
+            
+            <p className="text-xs text-serene-muted mb-6 leading-relaxed">
+              Listing items you are thankful for is a helpful tool for mindfulness. Try logging three things today.
             </p>
-          </div>
 
-          {/* ── DUAL COLUMN GRID FOR WIDE DESKTOPS ── */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: pastEntries.length > 0 ? "1fr 1fr" : "1fr",
-              gap: "24px",
-              alignItems: "start",
-            }}
-          >
-            {/* Column 1: Today's check-in */}
-            <div
-              style={{
-                backgroundColor: "rgba(26, 26, 46, 0.6)",
-                borderRadius: "16px",
-                border: "1px solid rgba(255, 255, 255, 0.08)",
-                padding: "24px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "14px",
-                backdropFilter: "blur(12px)",
-                animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards",
-                opacity: 0,
-              }}
-            >
-              <p style={{ fontSize: "12px", color: "#94A3B8", fontWeight: "600" }}>{formattedToday}</p>
-
+            <div className="flex flex-col gap-4 mb-6">
               {inputs.map((val, i) => {
                 const isFocused = focusedInput === i;
                 return (
-                  <div
-                    key={i}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
+                  <div key={i} className="flex items-center gap-3">
                     <div
-                      style={{
-                        width: "24px",
-                        height: "24px",
-                        borderRadius: "50%",
-                        backgroundColor: val.trim() ? "#E2E8F0" : isFocused ? "rgba(124, 58, 237, 0.3)" : "#0F0E17",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                        transition: "all 0.2s ease",
-                      }}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 transition-colors ${
+                        val.trim()
+                          ? "bg-serene-primary text-white"
+                          : isFocused
+                          ? "bg-serene-primarySoft text-serene-primary"
+                          : "bg-serene-bg text-serene-muted"
+                      }`}
                     >
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          fontWeight: "600",
-                          color: val.trim() ? "#0F0E17" : isFocused ? "#A78BFA" : "#94A3B8",
-                        }}
-                      >
-                        {i + 1}
-                      </span>
+                      {i + 1}
                     </div>
 
                     <input
@@ -173,103 +127,67 @@ function GratitudePage() {
                       onChange={(e) => handleChange(i, e.target.value)}
                       placeholder={
                         i === 0
-                          ? "I'm grateful for..."
+                          ? "I am thankful for..."
                           : i === 1
-                          ? "Something good today..."
-                          : "One more thing..."
+                          ? "Another thing I appreciate..."
+                          : "A small positive detail today..."
                       }
-                      style={{
-                        flex: 1,
-                        backgroundColor: "#0F0E17",
-                        border: isFocused ? "1px solid rgba(124, 58, 237, 0.4)" : "1px solid rgba(255, 255, 255, 0.08)",
-                        borderRadius: "10px",
-                        padding: "12px",
-                        fontSize: "13px",
-                        color: "#E2E8F0",
-                        outline: "none",
-                        fontFamily: "inherit",
-                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-                      }}
+                      className={`flex-1 bg-serene-bg border rounded-lg px-3 py-2 text-sm text-serene-text placeholder-serene-muted focus:outline-none focus:ring-1 focus:ring-serene-primary ${
+                        isFocused ? "border-serene-primary" : "border-serene-border"
+                      }`}
                     />
                   </div>
                 );
               })}
-
-              <button
-                onClick={handleSave}
-                disabled={!hasContent}
-                style={{
-                  marginTop: "4px",
-                  backgroundColor: hasContent ? "#E2E8F0" : "#2A2A4A",
-                  color: hasContent ? "#0F0E17" : "#94A3B8",
-                  border: "none",
-                  borderRadius: "10px",
-                  padding: "12px",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  cursor: hasContent ? "pointer" : "not-allowed",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                {saved ? "Saved ✓" : "Save for today"}
-              </button>
             </div>
 
-            {/* Column 2: Past entries list */}
-            {pastEntries.length > 0 && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "12px",
-                  animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards",
-                  opacity: 0,
-                }}
+            <div className="flex justify-end">
+              <Button
+                variant="primary"
+                onClick={handleSave}
+                disabled={!hasContent || saved}
+                icon={saved ? Check : undefined}
               >
-                <div style={{ marginBottom: "4px" }}>
-                  <p style={{ fontSize: "14px", fontWeight: "700", color: "#E2E8F0", textTransform: "uppercase", letterSpacing: "0.05em" }}>Past entries</p>
-                </div>
-
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {pastEntries.map((group, gi) => (
-                    <div
-                      key={gi}
-                      style={{
-                        backgroundColor: "rgba(26, 26, 46, 0.6)",
-                        borderRadius: "16px",
-                        border: "1px solid rgba(255, 255, 255, 0.08)",
-                        padding: "20px",
-                        backdropFilter: "blur(12px)",
-                      }}
-                    >
-                      <p style={{ fontSize: "11px", color: "#94A3B8", marginBottom: "10px", fontWeight: "500" }}>{group.date}</p>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {group.items.map((item, ii) => (
-                          <div key={ii} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                            <div
-                              style={{
-                                width: "6px",
-                                height: "6px",
-                                borderRadius: "50%",
-                                backgroundColor: "#7C3AED",
-                                marginTop: "6px",
-                                flexShrink: 0,
-                              }}
-                            />
-                            <p style={{ fontSize: "13px", color: "#E2E8F0", lineHeight: "1.5" }}>{item}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+                {saved ? "Logged ✓" : "Save today's check-in"}
+              </Button>
+            </div>
+          </Card>
         </div>
+
+        {/* Column 2: Past entries list */}
+        <div className="flex flex-col gap-6 animate-fade-in-up">
+          <h3 className="text-xs font-bold text-serene-muted uppercase tracking-wider">Past gratitude reflections</h3>
+
+          {pastEntries.length === 0 ? (
+            <EmptyState
+              title="No reflections logged yet"
+              description="Your saved daily gratitude entries will show up here."
+              icon={Heart}
+            />
+          ) : (
+            <div className="flex flex-col gap-4">
+              {pastEntries.map((group, gi) => (
+                <Card key={gi} className="border-serene-border p-5">
+                  <div className="flex items-center gap-1.5 text-xs text-serene-muted mb-3 font-semibold">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{group.date}</span>
+                  </div>
+
+                  <ul className="flex flex-col gap-2.5">
+                    {group.items.map((item, ii) => (
+                      <li key={ii} className="flex items-start gap-2.5 text-sm text-serene-text leading-relaxed font-serif">
+                        <div className="w-1.5 h-1.5 rounded-full bg-serene-accent flex-shrink-0 mt-2" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
-    </div>
+    </AppShell>
   );
 }
-
-export default GratitudePage;

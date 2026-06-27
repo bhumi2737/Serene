@@ -1,41 +1,13 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-
-const IconHome = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M3 10.5L12 4l9 6.5" />
-    <path d="M9 21V12h6v9" />
-  </svg>
-);
-
-const IconInsights = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M3 3v18h18" />
-    <path d="M7 13v6" />
-    <path d="M12 9v10" />
-    <path d="M17 5v14" />
-  </svg>
-);
-
-const IconJournal = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <path d="M5 3h14v18H5z" />
-    <path d="M9 7h6" />
-  </svg>
-);
-
-const IconProfile = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-    <circle cx="12" cy="8" r="3" />
-    <path d="M6 20c1.5-3 4.5-4 6-4s4.5 1 6 4" />
-  </svg>
-);
+import { Home, Smile, BookOpen, BarChart3, User } from "lucide-react";
 
 const navItems = [
-  { label: "Home", path: "/home", icon: <IconHome /> },
-  { label: "Insights", path: "/mood", icon: <IconInsights /> },
-  { label: "Journal", path: "/journal", icon: <IconJournal /> },
-  { label: "Profile", path: "/profile", icon: <IconProfile /> },
+  { label: "Home", path: "/home", icon: Home },
+  { label: "Mood", path: "/mood", icon: Smile },
+  { label: "Journal", path: "/journal", icon: BookOpen },
+  { label: "Insights", path: "/insights", icon: BarChart3 },
+  { label: "Profile", path: "/profile", icon: User },
 ];
 
 export default function BottomNav() {
@@ -43,30 +15,24 @@ export default function BottomNav() {
   const { pathname } = useLocation();
 
   return (
-    <nav className="fixed left-0 right-0 bottom-0 bg-serene-bg border-t border-serene-border">
-      <div className="max-w-[390px] mx-auto">
-        <div className="h-16 flex items-center justify-between px-4">
-          {navItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "3px",
-                color: pathname === item.path ? "#1C1917" : "#B0A99F",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              {item.icon}
-              <span style={{ fontSize: 11 }}>{item.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-serene-surface border-t border-serene-border z-40 h-16 flex justify-around items-center px-2">
+      {navItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = pathname === item.path;
+        return (
+          <button
+            key={item.path}
+            onClick={() => navigate(item.path)}
+            className={`flex flex-col items-center justify-center gap-1 w-16 h-12 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-serene-primary ${
+              isActive ? "text-serene-primary font-semibold" : "text-serene-muted hover:text-serene-text"
+            }`}
+            aria-current={isActive ? "page" : undefined}
+          >
+            <Icon className="w-5 h-5 flex-shrink-0" />
+            <span className="text-[10px] tracking-wide">{item.label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }

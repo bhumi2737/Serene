@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import AppShell from "../components/AppShell";
+import Card from "../components/Card";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -17,19 +19,29 @@ function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-6">Loading...</div>;
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="p-6 text-sm text-serene-muted">Loading session...</div>
+      </AppShell>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-lg p-10">
-        <h2 className="text-2xl font-semibold mb-4">Dashboard</h2>
-        {user ? (
-          <p className="text-gray-700">Hello, <strong>{user.name}</strong> — welcome to your Serene dashboard.</p>
-        ) : (
-          <p className="text-gray-600">No user data available.</p>
-        )}
+    <AppShell>
+      <div className="max-w-2xl mx-auto mt-10">
+        <Card className="border-serene-border p-10 text-center">
+          <h2 className="text-2xl font-bold font-serif text-serene-primary mb-4">Dashboard</h2>
+          {user ? (
+            <p className="text-serene-text leading-relaxed">
+              Hello, <strong>{user.name}</strong> — welcome to your Serene dashboard.
+            </p>
+          ) : (
+            <p className="text-serene-muted">No user data available.</p>
+          )}
+        </Card>
       </div>
-    </div>
+    </AppShell>
   );
 }
 

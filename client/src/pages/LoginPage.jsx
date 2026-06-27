@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import Button from "../components/Button";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -15,8 +16,10 @@ function LoginPage() {
     setLoading(true);
     try {
       const res = await api.login(email, password);
-      // store token
+      // store token & details
       localStorage.setItem("token", res.token);
+      localStorage.setItem("userName", res.name || "User");
+      localStorage.setItem("userEmail", res.email || email);
       navigate("/home");
     } catch (err) {
       setError(err?.message || "Login failed");
@@ -26,53 +29,56 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-10">
-        <h2 className="text-2xl font-semibold mb-6 text-center">Welcome Back 🌿</h2>
+    <div className="min-h-screen flex items-center justify-center px-6 bg-serene-bg text-serene-text font-sans">
+      <div className="max-w-md w-full bg-serene-surface border border-serene-border rounded-lg p-8 md:p-10 shadow-sm animate-fade-in-up">
+        <div className="text-center mb-8">
+          <span className="text-2xl">🌿</span>
+          <h2 className="text-2xl font-bold text-serene-primary font-serif mt-2">Welcome back</h2>
+          <p className="text-xs text-serene-muted mt-1">A quieter place to understand how you feel</p>
+        </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Email</label>
+            <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">Email Address</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Password</label>
+            <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
               required
             />
           </div>
 
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+          {error && <p className="text-xs font-semibold text-red-700 bg-red-50 p-2.5 rounded border border-red-200">{error}</p>}
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-indigo-600 text-white px-4 py-3 rounded-xl text-base font-medium hover:bg-indigo-700 transition disabled:opacity-50"
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            className="w-full py-2.5"
+          >
+            {loading ? "Signing in..." : "Sign in"}
+          </Button>
         </form>
 
-        <p className="text-center text-sm text-serene-muted mt-6">
-          Don't have an account?{' '}
+        <p className="text-center text-xs text-serene-muted mt-6">
+          Don't have an account?{" "}
           <button
-            onClick={() => navigate('/signup')}
-            className="text-serene-primary font-medium"
+            onClick={() => navigate("/signup")}
+            className="text-serene-primary font-semibold hover:underline"
           >
-            Sign up
+            Create one
           </button>
         </p>
       </div>

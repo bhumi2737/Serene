@@ -1,30 +1,34 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
+import AppShell from "../components/AppShell";
+import Button from "../components/Button";
+import Card from "../components/Card";
+import PageHeader from "../components/PageHeader";
+import { ChevronLeft, Save } from "lucide-react";
 
-function JournalNewPage() {
+const emotions = ["Calm", "Hopeful", "Anxious", "Sad", "Grateful"];
+
+export default function JournalNewPage() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
+  const [emotion, setEmotion] = useState("Calm");
   const [saved, setSaved] = useState(false);
 
   const handleSave = () => {
     if (!text.trim()) return;
 
-    // Build new entry object
     const newEntry = {
       id: Date.now(),
-      title: title.trim() || "Untitled",
-      preview: text.trim().slice(0, 80) + (text.length > 80 ? "..." : ""),
-      emotion: "Calm",
-      aiDetected: "—",
+      title: title.trim() || "Untitled reflection",
+      preview: text.trim(),
+      emotion,
+      aiDetected: "—", // Default empty for companion
       time: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
       date: "Today",
       fullText: text.trim(),
     };
 
-    // Load existing entries, add new one to top, save back
     const stored = localStorage.getItem("serene_journal");
     const existing = stored ? JSON.parse(stored) : [];
     const updated = [newEntry, ...existing];
@@ -35,137 +39,82 @@ function JournalNewPage() {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", backgroundColor: "#0F0E17", position: "relative" }}>
-      {/* Ambient Pulsing Glows */}
-      <div style={{
-        position: "absolute",
-        top: "10%",
-        left: "30%",
-        width: "500px",
-        height: "500px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, rgba(0,0,0,0) 70%)",
-        pointerEvents: "none",
-        zIndex: 0,
-        animation: "pulseGlow 12s ease-in-out infinite",
-      }} />
-
-      <Sidebar />
-      <div
-        style={{
-          marginLeft: "240px",
-          flex: 1,
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "48px 60px",
-            width: "100%",
-            boxSizing: "border-box",
-            animation: "fadeInUp 0.5s ease forwards",
-          }}
+    <AppShell>
+      {/* ── HEADER & NAVIGATION ── */}
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-serene-border">
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={ChevronLeft}
+          onClick={() => navigate("/journal")}
         >
-          {/* ── HEADER ── */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            {/* Back button */}
-            <button
-              onClick={() => navigate("/journal")}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                color: "#94A3B8",
-                fontSize: "13px",
-                padding: 0,
-              }}
-            >
-              <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-              Back
-            </button>
+          Back to list
+        </Button>
+        <Button
+          variant="primary"
+          icon={Save}
+          disabled={!text.trim() || saved}
+          onClick={handleSave}
+        >
+          {saved ? "Saved" : "Save Entry"}
+        </Button>
+      </div>
 
-            {/* Save button */}
-            <button
-              onClick={handleSave}
-              disabled={!text.trim()}
-              style={{
-                backgroundColor: text.trim() ? "#E2E8F0" : "#2A2A4A",
-                color: text.trim() ? "#0F0E17" : "#94A3B8",
-                border: "none",
-                borderRadius: "10px",
-                padding: "8px 20px",
-                fontSize: "13px",
-                fontWeight: "600",
-                cursor: text.trim() ? "pointer" : "not-allowed",
-                transition: "all 0.15s ease",
-              }}
-            >
-              {saved ? "Saved ✓" : "Save"}
-            </button>
-          </div>
+      <div className="max-w-2xl mx-auto">
+        <Card className="p-8">
+          <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider block mb-2">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
 
-          {/* ── DATE ── */}
-          <p style={{ fontSize: "11px", color: "#94A3B8", marginTop: "16px", fontWeight: "500" }}>
-            {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-          </p>
-
-          {/* ── TITLE INPUT ── */}
+          {/* Title Input */}
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title (optional)"
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
-              padding: "12px 0",
-              fontSize: "18px",
-              fontWeight: "600",
-              color: "#E2E8F0",
-              outline: "none",
-              fontFamily: "inherit",
-              width: "100%",
-              marginTop: "24px",
-              marginBottom: "20px",
-            }}
+            placeholder="Title of reflection"
+            className="w-full bg-transparent border-b border-serene-border py-3 text-xl font-semibold text-serene-primary placeholder-serene-muted focus:outline-none focus:border-serene-primary mb-6 font-serif"
           />
 
-          {/* ── BODY TEXTAREA ── */}
+          {/* Emotion Tag Selection */}
+          <div className="mb-6">
+            <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider block mb-3">
+              How does this reflect your emotional state?
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {emotions.map((emo) => {
+                const isActive = emotion === emo;
+                return (
+                  <button
+                    key={emo}
+                    type="button"
+                    onClick={() => setEmotion(emo)}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                      isActive
+                        ? "bg-serene-primarySoft border-serene-primary text-serene-primary font-semibold"
+                        : "bg-serene-bg border-serene-border text-serene-text hover:border-serene-muted"
+                    }`}
+                  >
+                    {emo}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Text Area Body */}
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Write freely..."
-            style={{
-              minHeight: "60vh",
-              backgroundColor: "transparent",
-              border: "none",
-              padding: "8px 0",
-              fontSize: "15px",
-              color: "#E2E8F0",
-              lineHeight: "1.8",
-              resize: "none",
-              outline: "none",
-              fontFamily: "inherit",
-              width: "100%",
-            }}
+            placeholder="Start writing freely..."
+            rows={12}
+            className="w-full bg-serene-bg border border-serene-border rounded-lg p-4 text-sm text-serene-text leading-relaxed font-serif focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none"
           />
-        </div>
+        </Card>
       </div>
-    </div>
+    </AppShell>
   );
 }
-
-export default JournalNewPage;

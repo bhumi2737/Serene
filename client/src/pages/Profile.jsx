@@ -1,323 +1,242 @@
-import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import AppShell from "../components/AppShell";
+import Card from "../components/Card";
+import Button from "../components/Button";
+import PageHeader from "../components/PageHeader";
+import { Save, Shield, Download, Trash2, LogOut, Check } from "lucide-react";
 
-function Profile() {
+export default function Profile() {
+  const navigate = useNavigate();
   const [name, setName] = useState("Bhumi");
   const [email, setEmail] = useState("bhumi@example.com");
   const [reminderTime, setReminderTime] = useState("20:00");
   const [notifications, setNotifications] = useState(true);
+  const [theme, setTheme] = useState("light");
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    const storedName = localStorage.getItem("userName");
+    const storedEmail = localStorage.getItem("userEmail");
+    if (storedName) setName(storedName);
+    if (storedEmail) setEmail(storedEmail);
+  }, []);
+
   const handleSave = () => {
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userEmail", email);
     setSaved(true);
     setTimeout(() => {
       setSaved(false);
-    }, 2500);
+    }, 2000);
   };
 
-  const cardStyle = {
-    backgroundColor: "rgba(26, 26, 46, 0.6)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "16px",
-    padding: "28px",
-    backdropFilter: "blur(12px)",
+  const handleExport = () => {
+    const data = {
+      journal: JSON.parse(localStorage.getItem("serene_journal") || "[]"),
+      gratitude: JSON.parse(localStorage.getItem("serene_gratitude") || "[]"),
+      profile: { name, email, reminderTime, notifications, theme }
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `serene-export-${name.toLowerCase().replace(/\s+/g, "-")}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
-  const labelStyle = {
-    color: "#94A3B8",
-    fontSize: "12px",
-    textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    display: "block",
-    marginBottom: "8px",
-    fontWeight: "600",
+  const handleDeleteAccount = () => {
+    if (window.confirm("Are you sure you want to permanently clear your local reflection logs? This action is irreversible.")) {
+      localStorage.clear();
+      navigate("/login");
+    }
   };
 
-  const inputStyle = {
-    width: "100%",
-    padding: "12px 16px",
-    backgroundColor: "#0F0E17",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
-    borderRadius: "10px",
-    color: "#E2E8F0",
-    fontSize: "14px",
-    outline: "none",
-    boxSizing: "border-box",
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+    navigate("/login");
   };
 
-  const firstLetter = name.charAt(0).toUpperCase() || "B";
+  const firstLetter = name.charAt(0).toUpperCase() || "U";
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden", backgroundColor: "#0F0E17", position: "relative" }}>
-      {/* Ambient Pulsing Glows */}
-      <div style={{
-        position: "absolute",
-        top: "10%",
-        left: "30%",
-        width: "500px",
-        height: "500px",
-        borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, rgba(0,0,0,0) 70%)",
-        pointerEvents: "none",
-        zIndex: 0,
-        animation: "pulseGlow 12s ease-in-out infinite",
-      }} />
+    <AppShell>
+      {/* ── PAGE HEADER ── */}
+      <PageHeader
+        title="Settings"
+        subtitle="Manage your profile preferences, privacy, and data exports"
+      />
 
-      <Sidebar />
-      <div
-        style={{
-          marginLeft: "240px",
-          flex: 1,
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          boxSizing: "border-box",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        {/* Independently Scrollable Container stretched to full width */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "40px 60px",
-            width: "100%",
-            boxSizing: "border-box",
-          }}
-        >
-          {/* Page Header */}
-          <div style={{ marginBottom: "36px", animation: "fadeInUp 0.5s ease forwards" }}>
-            <h1 style={{ color: "#FFFFFF", fontSize: "28px", fontWeight: "700", margin: "0 0 4px 0", letterSpacing: "-0.02em" }}>
-              Profile & Settings
-            </h1>
-            <p style={{ color: "#94A3B8", fontSize: "14px", margin: 0 }}>
-              Manage your account and preferences
+      {/* ── TWO COLUMN DESKTOP GRID / STACKED ON MOBILE ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-8">
+        
+        {/* Column 1: Account details */}
+        <div className="flex flex-col gap-6 animate-fade-in-up">
+          {/* Profile Overview Card */}
+          <Card className="flex items-center gap-4 border-serene-border">
+            <div className="w-16 h-16 rounded-full bg-serene-primary flex items-center justify-center text-white text-2xl font-bold font-serif">
+              {firstLetter}
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-serene-primary">{name}</h2>
+              <p className="text-xs text-serene-muted">{email}</p>
+              <div className="mt-2 inline-flex items-center gap-1.5 bg-serene-primarySoft text-serene-primary text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+                🔥 10 Day streak (demo data)
+              </div>
+            </div>
+          </Card>
+
+          {/* Account Info Form Card */}
+          <Card className="border-serene-border">
+            <h3 className="text-sm font-bold text-serene-primary uppercase tracking-wider mb-4">Account Info</h3>
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">
+                  Display name
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-serene-bg border border-serene-border rounded-lg p-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-serene-bg border border-serene-border rounded-lg p-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Privacy & Safety Card */}
+          <Card className="border-serene-border">
+            <h3 className="text-sm font-bold text-serene-primary uppercase tracking-wider mb-3">Privacy & Safety</h3>
+            <p className="text-xs text-serene-muted leading-relaxed mb-4">
+              Your entries and emotional history are stored locally. Serene does not upload reflection texts to unverified services.
             </p>
-          </div>
-
-          {/* ── 2 COLUMN DESKTOP GRID LAYOUT ── */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "24px",
-              alignItems: "start",
-            }}
-          >
-            {/* Column 1 — Left side settings */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px", animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards", opacity: 0 }}>
-              
-              {/* Avatar card */}
-              <div style={{ ...cardStyle, display: "flex", alignItems: "center", gap: "20px" }}>
-                <div
-                  style={{
-                    width: "72px",
-                    height: "72px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #7C3AED, #0D9488)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  <span style={{ color: "#FFFFFF", fontSize: "28px", fontWeight: "bold" }}>
-                    {firstLetter}
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", alignItems: "flex-start" }}>
-                  <div style={{ color: "#FFFFFF", fontSize: "18px", fontWeight: "600" }}>{name}</div>
-                  <div style={{ color: "#94A3B8", fontSize: "13px" }}>{email}</div>
-                  <div
-                    style={{
-                      backgroundColor: "rgba(124, 58, 237, 0.2)",
-                      border: "1px solid rgba(124, 58, 237, 0.4)",
-                      borderRadius: "20px",
-                      padding: "4px 10px",
-                      fontSize: "11px",
-                      color: "#A78BFA",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      fontWeight: "600",
-                    }}
-                  >
-                    🔥 Day 10 streak
-                  </div>
-                </div>
-              </div>
-
-              {/* Account Info card */}
-              <div style={cardStyle}>
-                <h2 style={{ color: "#E2E8F0", fontSize: "15px", fontWeight: "700", margin: "0 0 20px 0", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Account Info
-                </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                  <div>
-                    <label style={labelStyle}>Display Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      style={inputStyle}
-                    />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Email</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      style={inputStyle}
-                    />
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Column 2 — Right side Preferences & Journey */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px", animation: "fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards", opacity: 0 }}>
-              
-              {/* Preferences card */}
-              <div style={cardStyle}>
-                <h2 style={{ color: "#E2E8F0", fontSize: "15px", fontWeight: "700", margin: "0 0 20px 0", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Preferences
-                </h2>
-                <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                  {/* Daily Reminder Time */}
-                  <div>
-                    <label style={labelStyle}>Daily Reminder Time</label>
-                    <input
-                      type="time"
-                      value={reminderTime}
-                      onChange={(e) => setReminderTime(e.target.value)}
-                      style={{ ...inputStyle, marginBottom: "6px" }}
-                    />
-                    <span style={{ color: "#94A3B8", fontSize: "12px", fontWeight: "500" }}>
-                      We'll remind you to log your mood and journal at this time.
-                    </span>
-                  </div>
-
-                  {/* Browser Notifications Toggle */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <div style={{ color: "#E2E8F0", fontSize: "14px", fontWeight: "600" }}>
-                        Browser Notifications
-                      </div>
-                      <div style={{ color: "#94A3B8", fontSize: "12px", marginTop: "2px", fontWeight: "500" }}>
-                        Get gentle reminders throughout the day
-                      </div>
-                    </div>
-                    {/* Toggle Switch */}
-                    <div
-                      onClick={() => setNotifications(!notifications)}
-                      style={{
-                        width: "48px",
-                        height: "26px",
-                        borderRadius: "13px",
-                        backgroundColor: notifications ? "#7C3AED" : "#2A2A4A",
-                        cursor: "pointer",
-                        position: "relative",
-                        transition: "background-color 0.2s ease",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "20px",
-                          height: "20px",
-                          borderRadius: "50%",
-                          backgroundColor: "#FFFFFF",
-                          position: "absolute",
-                          top: "3px",
-                          left: notifications ? "25px" : "3px",
-                          transition: "left 0.2s ease",
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Your Journey card */}
-              <div style={cardStyle}>
-                <h2 style={{ color: "#E2E8F0", fontSize: "15px", fontWeight: "700", margin: "0 0 20px 0", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                  Your Journey
-                </h2>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
-                  {/* Stat Mini-card 1 */}
-                  <div
-                    style={{
-                      backgroundColor: "#0F0E17",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                      borderRadius: "12px",
-                      padding: "16px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <div style={{ fontSize: "22px", marginBottom: "4px" }}>📓</div>
-                    <div style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "bold" }}>18</div>
-                    <div style={{ color: "#94A3B8", fontSize: "11px", marginTop: "2px", fontWeight: "500" }}>Journal Entries</div>
-                  </div>
-                  {/* Stat Mini-card 2 */}
-                  <div
-                    style={{
-                      backgroundColor: "#0F0E17",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                      borderRadius: "12px",
-                      padding: "16px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <div style={{ fontSize: "22px", marginBottom: "4px" }}>📊</div>
-                    <div style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "bold" }}>10</div>
-                    <div style={{ color: "#94A3B8", fontSize: "11px", marginTop: "2px", fontWeight: "500" }}>Mood Logs</div>
-                  </div>
-                  {/* Stat Mini-card 3 */}
-                  <div
-                    style={{
-                      backgroundColor: "#0F0E17",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
-                      borderRadius: "12px",
-                      padding: "16px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <div style={{ fontSize: "22px", marginBottom: "4px" }}>🌸</div>
-                    <div style={{ color: "#FFFFFF", fontSize: "20px", fontWeight: "bold" }}>24</div>
-                    <div style={{ color: "#94A3B8", fontSize: "11px", marginTop: "2px", fontWeight: "500" }}>Gratitude Notes</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Save Button inside second column */}
-              <button
-                onClick={handleSave}
-                style={{
-                  width: "100%",
-                  padding: "14px",
-                  backgroundColor: saved ? "#0D9488" : "#7C3AED",
-                  border: "none",
-                  borderRadius: "12px",
-                  color: "#FFFFFF",
-                  fontSize: "15px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: "background 0.3s ease",
-                  outline: "none",
-                }}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                icon={Download}
+                onClick={handleExport}
               >
-                {saved ? "✓ Saved!" : "Save Changes"}
-              </button>
-
+                Export data (JSON)
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                icon={Trash2}
+                className="text-red-700 hover:bg-red-50 hover:text-red-700 border-red-200"
+                onClick={handleDeleteAccount}
+              >
+                Delete Account
+              </Button>
             </div>
-          </div>
-
+          </Card>
         </div>
+
+        {/* Column 2: Preferences */}
+        <div className="flex flex-col gap-6 animate-fade-in-up">
+          {/* Preference Settings Card */}
+          <Card className="border-serene-border">
+            <h3 className="text-sm font-bold text-serene-primary uppercase tracking-wider mb-4">Preferences</h3>
+            <div className="flex flex-col gap-5">
+              {/* Reminder time */}
+              <div>
+                <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">
+                  Daily Check-in reminder
+                </label>
+                <input
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => setReminderTime(e.target.value)}
+                  className="w-full max-w-[180px] bg-serene-bg border border-serene-border rounded-lg p-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
+                />
+              </div>
+
+              {/* Theme selector */}
+              <div>
+                <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">
+                  Application Theme
+                </label>
+                <select
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
+                  className="w-full max-w-[180px] bg-serene-bg border border-serene-border rounded-lg p-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
+                >
+                  <option value="light">Calm Light</option>
+                  <option value="dark">Dark (demo placeholder)</option>
+                </select>
+              </div>
+
+              {/* Accessible Switch Notification Toggle */}
+              <div className="flex items-center justify-between gap-4 pt-4 border-t border-serene-border">
+                <div>
+                  <h4 className="text-sm font-semibold text-serene-primary">Browser notifications</h4>
+                  <p className="text-xs text-serene-muted mt-0.5">Gentle reminders to check in daily</p>
+                </div>
+                
+                {/* Switch button */}
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={notifications}
+                  onClick={() => setNotifications(!notifications)}
+                  className={`w-11 h-6 rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-serene-primary ${
+                    notifications ? "bg-serene-primary" : "bg-serene-border"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                      notifications ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Quick Actions Card */}
+          <Card className="border-serene-border">
+            <h3 className="text-sm font-bold text-serene-primary uppercase tracking-wider mb-3">System Actions</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              icon={LogOut}
+              onClick={handleLogout}
+              className="w-full justify-start text-left"
+            >
+              Sign out from this session
+            </Button>
+          </Card>
+        </div>
+
       </div>
-    </div>
+
+      {/* ── RIGHT ALIGNED SAVE BUTTON ROW ── */}
+      <div className="flex justify-end gap-3 pb-8 border-t border-serene-border pt-6">
+        <Button
+          variant="primary"
+          onClick={handleSave}
+          disabled={saved}
+          icon={saved ? Check : Save}
+        >
+          {saved ? "Changes saved" : "Save changes"}
+        </Button>
+      </div>
+
+    </AppShell>
   );
 }
-
-export default Profile;
