@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 
 // Hardcoded AI responses — rotates through these for now
-// Real Claude API integration comes later in Month 2
 const aiReplies = [
   "I hear you. That sounds really difficult. Would you like to talk more about it?",
   "It's okay to feel that way. You're doing better than you think.",
@@ -40,7 +39,7 @@ function ChatPage() {
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text) return; // don't send empty messages
+    if (!text) return;
 
     // Add user message
     const userMessage = {
@@ -76,7 +75,21 @@ function ChatPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#FAFAF8" }}>
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", backgroundColor: "#0F0E17", position: "relative" }}>
+      {/* Ambient Pulsing Glows */}
+      <div style={{
+        position: "absolute",
+        top: "10%",
+        left: "30%",
+        width: "500px",
+        height: "500px",
+        borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, rgba(0,0,0,0) 70%)",
+        pointerEvents: "none",
+        zIndex: 0,
+        animation: "pulseGlow 12s ease-in-out infinite",
+      }} />
+
       <Sidebar />
       <div
         style={{
@@ -85,20 +98,24 @@ function ChatPage() {
           display: "flex",
           flexDirection: "column",
           height: "100vh",
-          maxWidth: "720px",
-          padding: "0 64px",
+          justifyContent: "space-between",
+          padding: "0 60px",
+          boxSizing: "border-box",
+          position: "relative",
+          zIndex: 1,
         }}
       >
-
         {/* ── HEADER ── */}
         <div
           style={{
             padding: "20px 0 14px",
-            borderBottom: "1px solid #E8E4DF",
+            borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
             display: "flex",
             alignItems: "center",
             gap: "12px",
-            backgroundColor: "#FAFAF8",
+            backgroundColor: "#0F0E17",
+            width: "100%",
+            animation: "fadeInUp 0.5s ease forwards",
           }}
         >
           {/* AI avatar */}
@@ -107,7 +124,7 @@ function ChatPage() {
               width: "36px",
               height: "36px",
               borderRadius: "10px",
-              backgroundColor: "#1C1917",
+              backgroundColor: "#E2E8F0",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -115,7 +132,7 @@ function ChatPage() {
             }}
           >
             {/* Leaf icon */}
-            <svg width="18" height="18" fill="none" stroke="#E8E0D5" strokeWidth="1.8" viewBox="0 0 24 24">
+            <svg width="18" height="18" fill="none" stroke="#16213E" strokeWidth="1.8" viewBox="0 0 24 24">
               <path d="M17 8C8 10 5.9 16.17 3.82 19.34a1 1 0 001.66 1.06C7 19 9.14 17 12 17c4 0 5-2 5-2" />
               <path d="M17 8l-5 9" />
               <path d="M17 8c0 0 3-1 3-5-4 0-5.5 2.5-5.5 2.5" />
@@ -124,23 +141,24 @@ function ChatPage() {
 
           {/* Name and status */}
           <div>
-            <p style={{ fontSize: "14px", fontWeight: "500", color: "#1C1917" }}>Serene</p>
-            <p style={{ fontSize: "11px", color: "#B0A99F" }}>Your companion · always here</p>
+            <p style={{ fontSize: "14px", fontWeight: "700", color: "#E2E8F0" }}>Serene</p>
+            <p style={{ fontSize: "11px", color: "#94A3B8", fontWeight: "500" }}>Your companion · always here</p>
           </div>
         </div>
 
-        {/* ── MESSAGES AREA ── */}
+        {/* ── MESSAGES AREA (scrolls independently, stretched full width) ── */}
         <div
           style={{
             flex: 1,
             overflowY: "auto",
-            padding: "16px 0",
+            padding: "20px 0",
             display: "flex",
             flexDirection: "column",
             gap: "12px",
+            width: "100%",
           }}
         >
-          {messages.map((msg) => (
+          {messages.map((msg, index) => (
             <div
               key={msg.id}
               style={{
@@ -148,26 +166,29 @@ function ChatPage() {
                 flexDirection: "column",
                 alignItems: msg.role === "user" ? "flex-end" : "flex-start",
                 gap: "4px",
+                animation: `fadeInUp 0.5s ease ${index * 0.05}s forwards`,
+                opacity: 0,
               }}
             >
               {/* Bubble */}
               <div
                 style={{
-                  maxWidth: "78%",
-                  backgroundColor: msg.role === "user" ? "#1C1917" : "#F5F0EB",
-                  color: msg.role === "user" ? "#F5F0EB" : "#1C1917",
+                  maxWidth: "70%",
+                  backgroundColor: msg.role === "user" ? "#E2E8F0" : "rgba(26, 26, 46, 0.6)",
+                  color: msg.role === "user" ? "#1A1A2E" : "#E2E8F0",
                   borderRadius: msg.role === "user"
-                    ? "16px 16px 4px 16px"   // user: sharp bottom-right
-                    : "16px 16px 16px 4px",  // ai: sharp bottom-left
-                  padding: "10px 14px",
+                    ? "16px 16px 4px 16px"
+                    : "16px 16px 16px 4px",
+                  padding: "12px 16px",
                   fontSize: "13px",
                   lineHeight: "1.6",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  backdropFilter: "blur(12px)",
                 }}
               >
                 {msg.text}
               </div>
-              {/* Timestamp */}
-              <span style={{ fontSize: "10px", color: "#B0A99F" }}>{msg.time}</span>
+              <span style={{ fontSize: "10px", color: "#94A3B8", fontWeight: "500", marginRight: msg.role === "user" ? "4px" : 0, marginLeft: msg.role !== "user" ? "4px" : 0 }}>{msg.time}</span>
             </div>
           ))}
 
@@ -176,15 +197,16 @@ function ChatPage() {
             <div style={{ display: "flex", alignItems: "flex-start", gap: "4px" }}>
               <div
                 style={{
-                  backgroundColor: "#F5F0EB",
+                  backgroundColor: "rgba(26, 26, 46, 0.6)",
                   borderRadius: "16px 16px 16px 4px",
-                  padding: "10px 16px",
+                  padding: "12px 18px",
                   display: "flex",
                   gap: "5px",
                   alignItems: "center",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  backdropFilter: "blur(12px)",
                 }}
               >
-                {/* Three animated dots */}
                 {[0, 1, 2].map((i) => (
                   <div
                     key={i}
@@ -192,7 +214,7 @@ function ChatPage() {
                       width: "6px",
                       height: "6px",
                       borderRadius: "50%",
-                      backgroundColor: "#B0A99F",
+                      backgroundColor: "#94A3B8",
                       animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
                     }}
                   />
@@ -201,20 +223,20 @@ function ChatPage() {
             </div>
           )}
 
-          {/* Invisible div to scroll to */}
           <div ref={bottomRef} />
         </div>
 
-        {/* ── INPUT BAR ── */}
+        {/* ── INPUT BAR (sticky at bottom) ── */}
         <div
           style={{
             marginTop: "auto",
-            backgroundColor: "#FAFAF8",
-            borderTop: "1px solid #E8E4DF",
+            backgroundColor: "#0F0E17",
+            borderTop: "1px solid rgba(255, 255, 255, 0.08)",
             padding: "16px 0",
             display: "flex",
             alignItems: "center",
-            gap: "10px",
+            gap: "12px",
+            width: "100%",
           }}
         >
           <textarea
@@ -225,26 +247,26 @@ function ChatPage() {
             rows={1}
             style={{
               flex: 1,
-              backgroundColor: "#F5F0EB",
-              border: "none",
+              backgroundColor: "rgba(26, 26, 46, 0.6)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
               borderRadius: "10px",
-              padding: "10px 12px",
+              padding: "12px 16px",
               fontSize: "13px",
-              color: "#1C1917",
+              color: "#E2E8F0",
               resize: "none",
               outline: "none",
               fontFamily: "inherit",
               lineHeight: "1.5",
+              backdropFilter: "blur(12px)",
             }}
           />
-          {/* Send button */}
           <button
             onClick={handleSend}
             style={{
-              width: "36px",
-              height: "36px",
+              width: "40px",
+              height: "40px",
               borderRadius: "10px",
-              backgroundColor: input.trim() ? "#1C1917" : "#E8E4DF",
+              backgroundColor: input.trim() ? "#E2E8F0" : "#2A2A4A",
               border: "none",
               cursor: input.trim() ? "pointer" : "not-allowed",
               display: "flex",
@@ -254,7 +276,7 @@ function ChatPage() {
               transition: "background-color 0.15s ease",
             }}
           >
-            <svg width="16" height="16" fill="none" stroke={input.trim() ? "#FAFAF8" : "#B0A99F"} strokeWidth="2" viewBox="0 0 24 24">
+            <svg width="18" height="18" fill="none" stroke={input.trim() ? "#0F0E17" : "#94A3B8"} strokeWidth="2" viewBox="0 0 24 24">
               <line x1="12" y1="19" x2="12" y2="5" />
               <polyline points="5 12 12 5 19 12" />
             </svg>

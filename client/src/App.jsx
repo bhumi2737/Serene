@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import HomePage from "./pages/HomePage";
+import Home from "./pages/Home";
 import MoodPage from "./pages/MoodPage";
 import Dashboard from "./pages/Dashboard";
 import JournalPage from "./pages/JournalPage";
@@ -12,21 +12,23 @@ import GratitudePage from "./pages/GratitudePage";
 import InsightsPage from "./pages/InsightsPage";
 import RequireAuth from "./components/RequireAuth";
 import JournalNewPage from "./pages/JournalNewPage";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
     <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/chat" element={<ChatPage />} />
-            <Route path="/gratitude" element={<GratitudePage />} />
-          <Route path="/journal/new" element={<JournalNewPage />} />
-        <Route path="/journal" element={<JournalPage />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/chat" element={<ChatPage />} />
+      <Route path="/gratitude" element={<GratitudePage />} />
+      <Route path="/journal/new" element={<JournalNewPage />} />
+      <Route path="/journal" element={<JournalPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
       <Route path="/mood" element={<MoodPage />} />
       <Route path="/insights" element={<InsightsPage />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   );
 }
