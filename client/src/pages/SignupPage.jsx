@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../services/api";
 import Button from "../components/Button";
 
 function SignupPage() {
@@ -10,20 +9,54 @@ function SignupPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setNameError("");
+    setEmailError("");
+    setPasswordError("");
     setError("");
+
+    let hasError = false;
+    if (!name.trim()) {
+      setNameError("This field is required.");
+      hasError = true;
+    }
+    if (!email.trim()) {
+      setEmailError("This field is required.");
+      hasError = true;
+    }
+    if (!password.trim()) {
+      setPasswordError("This field is required.");
+      hasError = true;
+    }
+    if (hasError) return;
+
     setLoading(true);
     try {
-      const res = await api.register(name, email, password);
-      // store token & details
-      localStorage.setItem("token", res.token);
-      localStorage.setItem("userName", res.name || name);
-      localStorage.setItem("userEmail", res.email || email);
-      navigate("/home");
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password: password.trim(),
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem("serene_token", data.token);
+        if (data.name) localStorage.setItem("userName", data.name);
+        if (data.email) localStorage.setItem("userEmail", data.email);
+        navigate("/home");
+      } else {
+        setError(data.message || "Registration failed");
+      }
     } catch (err) {
-      setError(err?.message || "Signup failed");
+      setError(err.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -38,16 +71,19 @@ function SignupPage() {
           <p className="text-xs text-serene-muted mt-1">A quieter place to understand how you feel</p>
         </div>
 
-        <form onSubmit={handleSignup} className="space-y-5">
+        <form onSubmit={handleSignup} className="space-y-5" noValidate>
           <div>
             <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">Name</label>
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (e.target.value.trim()) setNameError("");
+              }}
               className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
-              required
             />
+            {nameError && <p className="text-serene-amber text-xs mt-1 font-sans">{nameError}</p>}
           </div>
 
           <div>
@@ -55,10 +91,13 @@ function SignupPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (e.target.value.trim()) setEmailError("");
+              }}
               className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
-              required
             />
+            {emailError && <p className="text-serene-amber text-xs mt-1 font-sans">{emailError}</p>}
           </div>
 
           <div>
@@ -66,13 +105,14 @@ function SignupPage() {
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (e.target.value.trim()) setPasswordError("");
+              }}
               className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
-              required
             />
+            {passwordError && <p className="text-serene-amber text-xs mt-1 font-sans">{passwordError}</p>}
           </div>
-
-          {error && <p className="text-xs font-semibold text-red-700 bg-red-50 p-2.5 rounded border border-red-200">{error}</p>}
 
           <Button
             type="submit"
@@ -80,9 +120,15 @@ function SignupPage() {
             disabled={loading}
             className="w-full py-2.5"
           >
-            {loading ? "Creating account..." : "Create account"}
+            {loading ? "Signing up..." : "Create account"}
           </Button>
         </form>
+
+        {error && (
+          <div className="bg-[rgba(220,38,38,0.08)] border border-[rgba(220,38,38,0.2)] rounded-lg p-[10px_14px] text-[#B91C1C] text-[13px] mt-4 font-sans">
+            {error}
+          </div>
+        )}
 
         <p className="text-center text-xs text-serene-muted mt-6">
           Already have an account?{" "}

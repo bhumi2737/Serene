@@ -59,10 +59,9 @@ export default function Sidebar() {
                 key={item.label}
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-serene-primarySoft text-serene-primary font-semibold"
-                      : "text-serene-muted hover:text-serene-text hover:bg-serene-bg"
+                  `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${isActive
+                    ? "bg-serene-primarySoft text-serene-primary font-semibold"
+                    : "text-serene-muted hover:text-serene-text hover:bg-serene-bg"
                   }`
                 }
               >
@@ -79,10 +78,9 @@ export default function Sidebar() {
         <NavLink
           to="/profile"
           className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full overflow-hidden ${
-              isActive
-                ? "bg-serene-primarySoft text-serene-primary font-semibold"
-                : "text-serene-muted hover:text-serene-text hover:bg-serene-bg"
+            `flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full overflow-hidden ${isActive
+              ? "bg-serene-primarySoft text-serene-primary font-semibold"
+              : "text-serene-muted hover:text-serene-text hover:bg-serene-bg"
             }`
           }
         >

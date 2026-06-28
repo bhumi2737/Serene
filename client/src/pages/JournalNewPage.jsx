@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Card from "../components/Card";
-import PageHeader from "../components/PageHeader";
 import { ChevronLeft, Save } from "lucide-react";
 
 const emotions = ["Calm", "Hopeful", "Anxious", "Sad", "Grateful"];
@@ -15,27 +14,40 @@ export default function JournalNewPage() {
   const [emotion, setEmotion] = useState("Calm");
   const [saved, setSaved] = useState(false);
 
+  const [titleError, setTitleError] = useState("");
+  const [bodyError, setBodyError] = useState("");
+
   const handleSave = () => {
-    if (!text.trim()) return;
+    setTitleError("");
+    setBodyError("");
+
+    let hasError = false;
+    if (!title.trim()) {
+      setTitleError("This field is required.");
+      hasError = true;
+    }
+    if (!text.trim()) {
+      setBodyError("This field is required.");
+      hasError = true;
+    }
+    if (hasError) return;
+
+    const stored = localStorage.getItem("serene_journals");
+    const existing = stored ? JSON.parse(stored) : [];
 
     const newEntry = {
-      id: Date.now(),
-      title: title.trim() || "Untitled reflection",
-      preview: text.trim(),
-      emotion,
-      aiDetected: "—", // Default empty for companion
-      time: new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }),
-      date: "Today",
-      fullText: text.trim(),
+      date: new Date().toISOString().split("T")[0],
+      title: title.trim(),
+      body: text.trim(),
     };
 
-    const stored = localStorage.getItem("serene_journal");
-    const existing = stored ? JSON.parse(stored) : [];
-    const updated = [newEntry, ...existing];
-    localStorage.setItem("serene_journal", JSON.stringify(updated));
+    const updated = [...existing, newEntry];
+    localStorage.setItem("serene_journals", JSON.stringify(updated));
 
     setSaved(true);
-    setTimeout(() => navigate("/journal"), 1000);
+    setTimeout(() => {
+      navigate("/journal");
+    }, 500);
   };
 
   return (
@@ -53,7 +65,7 @@ export default function JournalNewPage() {
         <Button
           variant="primary"
           icon={Save}
-          disabled={!text.trim() || saved}
+          disabled={saved}
           onClick={handleSave}
         >
           {saved ? "Saved" : "Save Entry"}
@@ -71,15 +83,21 @@ export default function JournalNewPage() {
           </span>
 
           {/* Title Input */}
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title of reflection"
-            className="w-full bg-transparent border-b border-serene-border py-3 text-xl font-semibold text-serene-primary placeholder-serene-muted focus:outline-none focus:border-serene-primary mb-6 font-serif"
-          />
+          <div className="mb-6">
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (e.target.value.trim()) setTitleError("");
+              }}
+              placeholder="Title of reflection"
+              className="w-full bg-transparent border-b border-serene-border py-3 text-xl font-semibold text-serene-primary placeholder-serene-muted focus:outline-none focus:border-serene-primary font-serif"
+            />
+            {titleError && <p className="text-serene-amber text-xs mt-1 font-sans">{titleError}</p>}
+          </div>
 
-          {/* Emotion Tag Selection */}
+          {/* Emotion Tag Selection (kept for layout preservation) */}
           <div className="mb-6">
             <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider block mb-3">
               How does this reflect your emotional state?
@@ -106,13 +124,19 @@ export default function JournalNewPage() {
           </div>
 
           {/* Text Area Body */}
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Start writing freely..."
-            rows={12}
-            className="w-full bg-serene-bg border border-serene-border rounded-lg p-4 text-sm text-serene-text leading-relaxed font-serif focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none"
-          />
+          <div>
+            <textarea
+              value={text}
+              onChange={(e) => {
+                setText(e.target.value);
+                if (e.target.value.trim()) setBodyError("");
+              }}
+              placeholder="Start writing freely..."
+              rows={12}
+              className="w-full bg-serene-bg border border-serene-border rounded-lg p-4 text-sm text-serene-text leading-relaxed font-serif focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none"
+            />
+            {bodyError && <p className="text-serene-amber text-xs mt-1 font-sans">{bodyError}</p>}
+          </div>
         </Card>
       </div>
     </AppShell>

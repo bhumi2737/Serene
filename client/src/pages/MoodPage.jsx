@@ -1,17 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppShell from "../components/AppShell";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip
-} from "recharts";
 import { Smile, Check, AlertCircle } from "lucide-react";
 
 const moods = [
@@ -22,70 +13,95 @@ const moods = [
   { emoji: "🤩", label: "Amazing", value: 5, color: "#23443B" },
 ];
 
-// Demo weekly historical data formatted for Recharts
-const initialHistory = [
-  { name: "Mon", score: 3, label: "Good", date: "June 22" },
-  { name: "Tue", score: 2, label: "Okay", date: "June 23" },
-  { name: "Wed", score: 4, label: "Great", date: "June 24" },
-  { name: "Thu", score: 1, label: "Low", date: "June 25" },
-  { name: "Fri", score: 3, label: "Good", date: "June 26" },
-  { name: "Sat", score: 4, label: "Great", date: "June 27" },
-  { name: "Sun", score: 3, label: "Good", date: "June 28" },
-];
-
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-white border border-serene-border p-3 rounded-lg shadow-md text-xs">
-        <p className="font-bold text-serene-primary">{data.name} ({data.date})</p>
-        <p className="text-serene-text mt-1">Logged: {data.label}</p>
-      </div>
-    );
-  }
-  return null;
+const moodValueMap = {
+  Low: 1,
+  Okay: 2,
+  Good: 3,
+  Great: 4,
+  Amazing: 5,
 };
 
 export default function MoodPage() {
   const [selectedMood, setSelectedMood] = useState(null);
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
-  const [history, setHistory] = useState(initialHistory);
+  const [history, setHistory] = useState([]);
+
+  // Compute Monday of the current week (Monday to Sunday)
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weekDays = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    weekDays.push({
+      name: dayNames[i],
+      dateStr,
+      isToday: dateStr === today.toISOString().split("T")[0],
+    });
+  }
+
+  // Load mood entries on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("serene_moods");
+    const currentMoods = stored ? JSON.parse(stored) : [];
+    setHistory(currentMoods);
+
+    const todayString = today.toISOString().split("T")[0];
+    const todayEntry = currentMoods.find((m) => m.date === todayString);
+    if (todayEntry) {
+      const idx = moods.findIndex((m) => m.label === todayEntry.mood);
+      if (idx > -1) {
+        setSelectedMood(idx);
+      }
+    }
+  }, []);
+
+  const handleMoodClick = (index) => {
+    setSelectedMood(index);
+    const selectedMoodLabel = moods[index].label;
+    const todayString = new Date().toISOString().split("T")[0];
+
+    const stored = localStorage.getItem("serene_moods");
+    let currentMoods = stored ? JSON.parse(stored) : [];
+
+    const existingIndex = currentMoods.findIndex((m) => m.date === todayString);
+    if (existingIndex > -1) {
+      currentMoods[existingIndex].mood = selectedMoodLabel;
+    } else {
+      currentMoods.push({ date: todayString, mood: selectedMoodLabel });
+    }
+
+    localStorage.setItem("serene_moods", JSON.stringify(currentMoods));
+    setHistory(currentMoods);
+  };
 
   const handleSave = () => {
     if (selectedMood === null) return;
+    handleMoodClick(selectedMood);
 
-    // Append mock entry to demo history for today
-    const currentMood = moods[selectedMood];
-    const newEntry = {
-      name: "Sun",
-      score: currentMood.value,
-      label: currentMood.label,
-      date: "Today",
-    };
-
-    // Replace Sunday's placeholder entry
-    const updated = history.map((h) => (h.name === "Sun" ? newEntry : h));
-    setHistory(updated);
     setSaved(true);
-
     setTimeout(() => {
       setSaved(false);
-      setSelectedMood(null);
-      setNote("");
     }, 2000);
   };
 
-  const getMoodYLabel = (tick) => {
-    switch (tick) {
-      case 1: return "😔 Low";
-      case 2: return "😐 Okay";
-      case 3: return "😊 Good";
-      case 4: return "😄 Great";
-      case 5: return "🤩 Amazing";
-      default: return "";
-    }
-  };
+  // Filter moods that fall within the current week
+  const weeklyMoodsCount = weekDays.reduce((acc, day) => {
+    const entry = history.find((m) => m.date === day.dateStr);
+    if (entry) acc += 1;
+    return acc;
+  }, 0);
 
   return (
     <AppShell>
@@ -96,7 +112,6 @@ export default function MoodPage() {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
         {/* Left Side: Logger Card */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <Card className="border-serene-border">
@@ -110,7 +125,7 @@ export default function MoodPage() {
                 return (
                   <button
                     key={mood.label}
-                    onClick={() => setSelectedMood(i)}
+                    onClick={() => handleMoodClick(i)}
                     className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
                       isSelected
                         ? "border-serene-primary bg-serene-primarySoft text-serene-primary font-semibold"
@@ -161,54 +176,72 @@ export default function MoodPage() {
           </div>
         </div>
 
-        {/* Right Side: Recharts Bar Visualization */}
+        {/* Right Side: Plain SVG Bar Chart (This week's moods) */}
         <div className="flex flex-col gap-6">
           <Card className="border-serene-border">
             <div className="mb-4">
-              <h3 className="text-sm font-bold text-serene-primary uppercase tracking-wider">Weekly trend</h3>
-              <p className="text-[11px] text-serene-muted mt-0.5">June 22 – June 28 (demo data)</p>
+              <h3 className="text-sm font-bold text-serene-primary uppercase tracking-wider">This week's moods</h3>
+              <p className="text-[11px] text-serene-muted mt-0.5">
+                {monday.toLocaleDateString("en-US", { month: "short", day: "numeric" })} –{" "}
+                {sunday.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </p>
             </div>
 
-            <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={history}
-                  margin={{ top: 10, right: 5, left: -25, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#DDE6E2" vertical={false} />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#66736F", fontSize: 10 }}
-                  />
-                  <YAxis
-                    domain={[1, 5]}
-                    ticks={[1, 2, 3, 4, 5]}
-                    tickFormatter={getMoodYLabel}
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: "#66736F", fontSize: 9 }}
-                  />
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(35, 68, 59, 0.03)" }} />
-                  <Bar
-                    dataKey="score"
-                    fill="#A9C7E8"
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={28}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-44 w-full flex flex-col justify-end">
+              <svg width="100%" height="100" viewBox="0 0 700 100" preserveAspectRatio="none" className="overflow-visible">
+                {weekDays.map((day, idx) => {
+                  const entry = history.find((m) => m.date === day.dateStr);
+                  const val = entry ? moodValueMap[entry.mood] || 0 : 0;
+                  const barHeight = val * 20; // scaled to a max height of 100px (5 * 20)
+                  const y = 100 - barHeight;
+                  const x = 35 + idx * 95; // 7 bars distributed
+                  
+                  // Past days with no entry get a lighter fill (#EDE8DC)
+                  // Today's bar gets a darker fill (#4A7C59)
+                  // Past days with entries get #D4CDB8
+                  let fill = "#EDE8DC";
+                  if (day.isToday) {
+                    fill = "#4A7C59";
+                  } else if (entry) {
+                    fill = "#D4CDB8";
+                  }
+
+                  return (
+                    <rect
+                      key={day.name}
+                      x={x}
+                      y={y}
+                      width="35"
+                      height={barHeight}
+                      rx="4"
+                      fill={fill}
+                    />
+                  );
+                })}
+              </svg>
+
+              {/* Day Labels Row */}
+              <div className="grid grid-cols-7 text-center mt-3 border-t border-serene-border pt-2">
+                {weekDays.map((day) => (
+                  <span
+                    key={day.name}
+                    className={`text-[11px] font-sans ${
+                      day.isToday ? "font-bold text-serene-text" : "text-serene-muted"
+                    }`}
+                  >
+                    {day.name}
+                  </span>
+                ))}
+              </div>
             </div>
 
-            <div className="border-t border-serene-border pt-4 mt-2 text-center">
+            <div className="border-t border-serene-border pt-4 mt-6 text-center">
               <p className="text-xs font-semibold text-serene-primary">
-                You checked in 7 times this week (demo data)
+                You checked in {weeklyMoodsCount} times this week
               </p>
             </div>
           </Card>
         </div>
-
       </div>
     </AppShell>
   );

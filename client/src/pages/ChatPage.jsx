@@ -80,7 +80,7 @@ export default function ChatPage() {
       />
 
       <div className="flex flex-col h-[calc(100vh-210px)] max-w-4xl mx-auto">
-        
+
         {/* ── CRISIS / SAFETY WARNING ── */}
         <div className="flex items-start gap-2.5 p-3 bg-serene-primarySoft/35 border border-serene-border rounded-lg text-xs text-serene-text mb-4">
           <AlertTriangle className="w-4 h-4 text-serene-accent flex-shrink-0 mt-0.5" />
@@ -99,11 +99,10 @@ export default function ChatPage() {
                 className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
               >
                 <div
-                  className={`max-w-[75%] rounded-lg px-4 py-2.5 text-sm leading-relaxed ${
-                    isUser
+                  className={`max-w-[75%] rounded-lg px-4 py-2.5 text-sm leading-relaxed ${isUser
                       ? "bg-serene-primary text-white"
                       : "bg-serene-surface border border-serene-border text-serene-text font-serif"
-                  }`}
+                    }`}
                 >
                   {msg.text}
                 </div>

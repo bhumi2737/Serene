@@ -3,190 +3,187 @@ import AppShell from "../components/AppShell";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
-import EmptyState from "../components/EmptyState";
-import { Heart, Check, Calendar } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export default function GratitudePage() {
   const [inputs, setInputs] = useState(["", "", ""]);
-  const [saved, setSaved] = useState(false);
   const [pastEntries, setPastEntries] = useState([]);
-  const [focusedInput, setFocusedInput] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("serene_gratitude");
     if (stored) {
-      setPastEntries(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      // Sort by date descending
+      const sorted = parsed.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setPastEntries(sorted);
     } else {
-      // Default placeholder logs for demonstration
-      const defaults = [
-        {
-          date: "Yesterday",
-          items: [
-            "Had a warm cup of herbal tea in the morning.",
-            "A nice conversation with an old friend.",
-            "Completed my project milestones ahead of schedule."
-          ]
-        },
-        {
-          date: "Last Wednesday",
-          items: [
-            "The weather was calm and sunny.",
-            "Read a helpful article on mindfulness."
-          ]
-        }
-      ];
-      setPastEntries(defaults);
-      localStorage.setItem("serene_gratitude", JSON.stringify(defaults));
+      setPastEntries([]);
     }
   }, []);
 
   const handleChange = (index, value) => {
-    const updated = [...inputs];
-    updated[index] = value;
-    setInputs(updated);
+    const nextInputs = [...inputs];
+    nextInputs[index] = value;
+    setInputs(nextInputs);
+    setErrorMsg("");
   };
-
-  const hasContent = inputs.some((val) => val.trim() !== "");
 
   const handleSave = () => {
-    if (!hasContent) return;
+    setErrorMsg("");
+    setSuccess(false);
 
-    const today = new Date().toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "short",
-      day: "numeric",
-    });
+    const item1 = inputs[0] || "";
+    const item2 = inputs[1] || "";
+    const item3 = inputs[2] || "";
 
+    if (!item1.trim() && !item2.trim() && !item3.trim()) {
+      setErrorMsg("Please add at least one item.");
+      return;
+    }
+
+    const stored = localStorage.getItem("serene_gratitude");
+    let currentEntries = stored ? JSON.parse(stored) : [];
+
+    const todayString = new Date().toISOString().split("T")[0];
     const newEntry = {
-      date: today,
-      items: inputs.filter((val) => val.trim() !== ""),
+      date: todayString,
+      items: [item1.trim(), item2.trim(), item3.trim()],
     };
 
-    const updated = [newEntry, ...pastEntries];
-    setPastEntries(updated);
-    localStorage.setItem("serene_gratitude", JSON.stringify(updated));
+    const existingIndex = currentEntries.findIndex((e) => e.date === todayString);
+    if (existingIndex > -1) {
+      currentEntries[existingIndex] = newEntry;
+    } else {
+      currentEntries.push(newEntry);
+    }
 
+    localStorage.setItem("serene_gratitude", JSON.stringify(currentEntries));
+
+    // Sort and update past entries list
+    const sorted = [...currentEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
+    setPastEntries(sorted);
+
+    // Clear inputs & show success
     setInputs(["", "", ""]);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setSuccess(true);
+
+    setTimeout(() => {
+      setSuccess(false);
+    }, 2000);
   };
 
-  const formattedToday = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-  });
+  const formatDate = (dateStr) => {
+    try {
+      const d = new Date(dateStr + "T00:00:00");
+      return d.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch (e) {
+      return dateStr;
+    }
+  };
 
   return (
     <AppShell>
       {/* ── PAGE HEADER ── */}
       <PageHeader
-        title="Gratitude Journal"
-        subtitle="Slow down and write down small things that bring you comfort"
+        title="Gratitude"
+        subtitle="Three things you're grateful for today."
       />
 
-      {/* ── DUAL COLUMN GRID LAYOUT ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        
         {/* Column 1: Today's check-in */}
         <div className="flex flex-col gap-4 animate-fade-in-up">
-          <Card className="border-serene-border">
-            <div className="flex items-center gap-2 mb-4">
-              <Heart className="w-4 h-4 text-serene-accent" />
-              <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider">
-                {formattedToday} Check-in
-              </span>
-            </div>
-            
-            <p className="text-xs text-serene-muted mb-6 leading-relaxed">
-              Listing items you are thankful for is a helpful tool for mindfulness. Try logging three things today.
-            </p>
+          <Card className="border-serene-border p-7 bg-white">
+            <h2 className="font-serif text-[16px] text-serene-text font-semibold mb-4.5">
+              Today's highlights
+            </h2>
 
-            <div className="flex flex-col gap-4 mb-6">
-              {inputs.map((val, i) => {
-                const isFocused = focusedInput === i;
-                return (
-                  <div key={i} className="flex items-center gap-3">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 transition-colors ${
-                        val.trim()
-                          ? "bg-serene-primary text-white"
-                          : isFocused
-                          ? "bg-serene-primarySoft text-serene-primary"
-                          : "bg-serene-bg text-serene-muted"
-                      }`}
-                    >
-                      {i + 1}
-                    </div>
-
-                    <input
-                      type="text"
-                      value={val}
-                      onFocus={() => setFocusedInput(i)}
-                      onBlur={() => setFocusedInput(null)}
-                      onChange={(e) => handleChange(i, e.target.value)}
-                      placeholder={
-                        i === 0
-                          ? "I am thankful for..."
-                          : i === 1
-                          ? "Another thing I appreciate..."
-                          : "A small positive detail today..."
-                      }
-                      className={`flex-1 bg-serene-bg border rounded-lg px-3 py-2 text-sm text-serene-text placeholder-serene-muted focus:outline-none focus:ring-1 focus:ring-serene-primary ${
-                        isFocused ? "border-serene-primary" : "border-serene-border"
-                      }`}
-                    />
-                  </div>
-                );
-              })}
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                value={inputs[0]}
+                onChange={(e) => handleChange(0, e.target.value)}
+                placeholder="1. I'm grateful for..."
+                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+              />
+              <input
+                type="text"
+                value={inputs[1]}
+                onChange={(e) => handleChange(1, e.target.value)}
+                placeholder="2. I'm grateful for..."
+                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+              />
+              <input
+                type="text"
+                value={inputs[2]}
+                onChange={(e) => handleChange(2, e.target.value)}
+                placeholder="3. I'm grateful for..."
+                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+              />
             </div>
 
-            <div className="flex justify-end">
-              <Button
-                variant="primary"
-                onClick={handleSave}
-                disabled={!hasContent || saved}
-                icon={saved ? Check : undefined}
-              >
-                {saved ? "Logged ✓" : "Save today's check-in"}
-              </Button>
-            </div>
+            {errorMsg && (
+              <p className="text-serene-amber text-xs mt-3 font-sans font-medium">
+                {errorMsg}
+              </p>
+            )}
+
+            {success && (
+              <p className="text-[#4A7C59] text-xs mt-3 font-sans font-medium">
+                Saved! 🌿
+              </p>
+            )}
+
+            <button
+              onClick={handleSave}
+              className="bg-serene-green text-white text-[14px] font-medium py-2.5 px-6 rounded-lg border-0 hover:bg-[#3d664a] transition-colors mt-5 cursor-pointer"
+            >
+              Save today's gratitude
+            </button>
           </Card>
         </div>
 
         {/* Column 2: Past entries list */}
         <div className="flex flex-col gap-6 animate-fade-in-up">
-          <h3 className="text-xs font-bold text-serene-muted uppercase tracking-wider">Past gratitude reflections</h3>
+          <h3 className="font-serif text-[16px] text-serene-text font-semibold">
+            Previous entries
+          </h3>
 
           {pastEntries.length === 0 ? (
-            <EmptyState
-              title="No reflections logged yet"
-              description="Your saved daily gratitude entries will show up here."
-              icon={Heart}
-            />
+            <p className="text-serene-muted text-sm italic">
+              No previous entries yet.
+            </p>
           ) : (
             <div className="flex flex-col gap-4">
-              {pastEntries.map((group, gi) => (
-                <Card key={gi} className="border-serene-border p-5">
-                  <div className="flex items-center gap-1.5 text-xs text-serene-muted mb-3 font-semibold">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{group.date}</span>
-                  </div>
+              {pastEntries.map((entry, idx) => (
+                <Card key={idx} className="border-serene-border p-5">
+                  <span className="block text-[11px] font-bold text-serene-muted tracking-wider uppercase font-sans mb-3">
+                    {formatDate(entry.date)}
+                  </span>
 
-                  <ul className="flex flex-col gap-2.5">
-                    {group.items.map((item, ii) => (
-                      <li key={ii} className="flex items-start gap-2.5 text-sm text-serene-text leading-relaxed font-serif">
-                        <div className="w-1.5 h-1.5 rounded-full bg-serene-accent flex-shrink-0 mt-2" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
+                  <ul className="flex flex-col gap-2">
+                    {entry.items
+                      .filter((item) => item && item.trim() !== "")
+                      .map((item, itemIdx) => (
+                        <li
+                          key={itemIdx}
+                          className="text-serene-text text-[13px] leading-relaxed font-sans flex items-start gap-2"
+                        >
+                          <span className="text-serene-amber">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
                   </ul>
                 </Card>
               ))}
             </div>
           )}
         </div>
-
       </div>
     </AppShell>
   );
