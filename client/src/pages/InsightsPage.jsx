@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { calculateStreak } from "../utils/streak";
 import AppShell from "../components/AppShell";
 import Card from "../components/Card";
 import StatItem from "../components/StatItem";
@@ -45,6 +46,91 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 export default function InsightsPage() {
+  const [reportRange, setReportRange] = useState("weekly");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [reportError, setReportError] = useState("");
+
+  const activeStyle = {
+    border: "1px solid #D4CDB8",
+    borderRadius: "8px",
+    padding: "8px 16px",
+    fontSize: "13px",
+    cursor: "pointer",
+    backgroundColor: "#D4CDB8",
+    color: "#2C2416",
+  };
+
+  const inactiveStyle = {
+    border: "1px solid #D4CDB8",
+    borderRadius: "8px",
+    padding: "8px 16px",
+    fontSize: "13px",
+    cursor: "pointer",
+    backgroundColor: "transparent",
+    color: "#8C7E6A",
+  };
+
+  const downloadButtonStyle = {
+    backgroundColor: "#2C2416",
+    color: "white",
+    borderRadius: "8px",
+    padding: "10px 24px",
+    fontSize: "14px",
+    cursor: isGenerating ? "not-allowed" : "pointer",
+    border: "none",
+  };
+
+  const handleDownload = async () => {
+    setIsGenerating(true);
+    setReportError("");
+    try {
+      const storedMoods = localStorage.getItem("serene_moods");
+      const moods = storedMoods ? JSON.parse(storedMoods) : [];
+
+      const storedJournals = localStorage.getItem("serene_journals");
+      const journals = storedJournals ? JSON.parse(storedJournals) : [];
+
+      const storedGratitude = localStorage.getItem("serene_gratitude");
+      const gratitude = storedGratitude ? JSON.parse(storedGratitude) : [];
+
+      const streak = calculateStreak();
+
+      const response = await fetch("http://localhost:5000/api/report/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          range: reportRange,
+          moods,
+          journals,
+          gratitude,
+          streak,
+        }),
+      });
+
+      if (!response.ok) {
+        setReportError("Failed to generate report. Please try again.");
+        setIsGenerating(false);
+        return;
+      }
+
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = "serene-report.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(objectUrl);
+      setIsGenerating(false);
+    } catch (error) {
+      setReportError("Something went wrong. Please try again.");
+      setIsGenerating(false);
+    }
+  };
+
   const getWeeklyRange = () => {
     const end = new Date();
     const start = new Date();
@@ -163,6 +249,45 @@ export default function InsightsPage() {
         <p className="text-sm text-serene-text leading-relaxed font-serif">
           Your emotional logs show steady, supportive trends this week. Thursday reflected a slightly lower check-in matching a journal note containing higher stress descriptors. However, Friday logged a solid rebound. Continuing to document your days regularly helps build mindfulness.
         </p>
+      </Card>
+
+      {/* ── DOWNLOAD WELLNESS REPORT CARD ── */}
+      <Card className="border-serene-border mb-8">
+        <div className="mb-4">
+          <h3 className="text-base font-bold text-serene-primary font-serif">Download Wellness Report</h3>
+          <p className="text-[13px] text-serene-muted mt-0.5">
+            Get a summary of your mood, journal, and gratitude data.
+          </p>
+        </div>
+
+        <div className="flex gap-[12px] mb-4">
+          <button
+            onClick={() => setReportRange("weekly")}
+            style={reportRange === "weekly" ? activeStyle : inactiveStyle}
+          >
+            Weekly
+          </button>
+          <button
+            onClick={() => setReportRange("monthly")}
+            style={reportRange === "monthly" ? activeStyle : inactiveStyle}
+          >
+            Monthly
+          </button>
+        </div>
+
+        <button
+          onClick={handleDownload}
+          disabled={isGenerating}
+          style={downloadButtonStyle}
+        >
+          {isGenerating ? "Generating..." : "Download PDF Report"}
+        </button>
+
+        {reportError && (
+          <p style={{ color: "#C17F24", fontSize: "13px", marginTop: "8px" }}>
+            {reportError}
+          </p>
+        )}
       </Card>
     </AppShell>
   );

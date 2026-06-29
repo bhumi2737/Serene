@@ -21,6 +21,8 @@ app.use(express.json()); // Allows backend to read JSON from requests
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
+const reportRoutes = require("./routes/reportRoutes");
+app.use("/api/report", reportRoutes);
 
 // Test route - just to check if server is running
 app.get("/", (req, res) => {
