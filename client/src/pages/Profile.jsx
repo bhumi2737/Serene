@@ -5,6 +5,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
 import { Save, Shield, Download, Trash2, LogOut, Check } from "lucide-react";
+import { calculateStreak } from "../utils/streak";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -14,12 +15,27 @@ export default function Profile() {
   const [notifications, setNotifications] = useState(true);
   const [theme, setTheme] = useState("light");
   const [saved, setSaved] = useState(false);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
     const storedEmail = localStorage.getItem("userEmail");
     if (storedName) setName(storedName);
     if (storedEmail) setEmail(storedEmail);
+    
+    setStreak(calculateStreak());
+
+    const handleFocus = () => {
+      setStreak(calculateStreak());
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
   }, []);
 
   const handleSave = () => {
@@ -84,7 +100,7 @@ export default function Profile() {
               <h2 className="text-lg font-bold text-serene-primary">{name}</h2>
               <p className="text-xs text-serene-muted">{email}</p>
               <div className="mt-2 inline-flex items-center gap-1.5 bg-serene-primarySoft text-serene-primary text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-                🔥 10 Day streak (demo data)
+                🔥 {streak} Day streak
               </div>
             </div>
           </Card>

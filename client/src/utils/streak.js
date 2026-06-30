@@ -22,3 +22,32 @@ export function calculateStreak() {
 
   return streak;
 }
+
+export function calculateLongestStreak() {
+  const stored = localStorage.getItem("serene_moods");
+  const moods = stored ? JSON.parse(stored) : [];
+  if (moods.length === 0) {
+    return 0;
+  }
+
+  const dateStrings = moods.map((entry) => entry.date);
+  const uniqueDates = [...new Set(dateStrings)];
+  uniqueDates.sort((a, b) => new Date(a) - new Date(b));
+
+  let currentRun = 1;
+  let longestRun = 1;
+
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const prevDate = new Date(uniqueDates[i - 1]);
+    const currDate = new Date(uniqueDates[i]);
+    if (currDate - prevDate === 86400000) {
+      currentRun++;
+    } else {
+      currentRun = 1;
+    }
+    longestRun = Math.max(longestRun, currentRun);
+  }
+
+  return longestRun;
+}
+
