@@ -24,7 +24,7 @@ function LandingPage() {
   return (
     <div className="h-screen overflow-y-auto flex flex-col bg-serene-bg text-serene-text font-sans">
       {/* ── CLEAN WHITE NAVIGATION ── */}
-      <header className="bg-white border-b border-serene-border sticky top-0 z-50">
+      <header className="bg-white dark:bg-[#1C1B1F] border-b border-serene-border dark:border-[#3A3742] sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <span onClick={() => navigate("/")} className="text-lg font-bold text-serene-primary flex items-center gap-2 cursor-pointer">
@@ -102,7 +102,7 @@ function LandingPage() {
       </section>
 
       {/* ── FEATURES SECTION ── */}
-      <section id="features" className="py-20 bg-white border-b border-serene-border">
+      <section id="features" className="py-20 bg-white dark:bg-[#1C1B1F] border-b border-serene-border dark:border-[#3A3742]">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl font-bold text-serene-primary font-serif mb-4">Quiet space for reflection</h2>
@@ -147,7 +147,7 @@ function LandingPage() {
             Serene is a self-guided mental wellness tool designed to support reflection, journaling, and mindful awareness.
             <strong> It is not a clinical therapy service, medical diagnostic tool, or emergency intervention service.</strong>
           </p>
-          <div className="p-6 bg-white border border-serene-border rounded-lg text-left max-w-2xl mx-auto">
+          <div className="p-6 bg-white dark:bg-[#25232A] border border-serene-border dark:border-[#3A3742] rounded-lg text-left max-w-2xl mx-auto">
             <h4 className="text-xs uppercase font-bold text-serene-accent tracking-wider mb-2">Need immediate support?</h4>
             <p className="text-xs text-serene-muted leading-relaxed">
               If you are experiencing a mental health emergency, crisis, or thoughts of self-harm, please reach out to professional emergency services or standard hotlines immediately (such as calling 988 in the US/Canada or contacting standard local emergency services).
@@ -157,7 +157,7 @@ function LandingPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-white py-12 text-sm border-t border-serene-border mt-auto">
+      <footer className="bg-white dark:bg-[#1C1B1F] py-12 text-sm border-t border-serene-border dark:border-[#3A3742] mt-auto">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-serene-muted text-xs">
             © {new Date().getFullYear()} Serene. All wellness features are self-check templates.

@@ -63,17 +63,17 @@ function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-serene-bg text-serene-text font-sans">
-      <div className="max-w-md w-full bg-serene-surface border border-serene-border rounded-lg p-8 md:p-10 shadow-sm animate-fade-in-up">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-serene-bg dark:bg-[#1C1B1F] text-serene-text dark:text-[#EDE8E0] font-sans">
+      <div className="max-w-md w-full bg-serene-surface dark:bg-[#25232A] border border-serene-border dark:border-[#3A3742] rounded-lg p-8 md:p-10 shadow-sm animate-fade-in-up">
         <div className="text-center mb-8">
           <span className="text-2xl">🌿</span>
-          <h2 className="text-2xl font-bold text-serene-primary font-serif mt-2">Create Account</h2>
-          <p className="text-xs text-serene-muted mt-1">A quieter place to understand how you feel</p>
+          <h2 className="text-2xl font-bold text-serene-primary dark:text-[#EDE8E0] font-serif mt-2">Create Account</h2>
+          <p className="text-xs text-serene-muted dark:text-[#A39C8F] mt-1">A quieter place to understand how you feel</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-5" noValidate>
           <div>
-            <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">Name</label>
+            <label className="block text-xs font-semibold text-serene-muted dark:text-[#A39C8F] uppercase tracking-wider mb-2">Name</label>
             <input
               type="text"
               value={name}
@@ -81,13 +81,13 @@ function SignupPage() {
                 setName(e.target.value);
                 if (e.target.value.trim()) setNameError("");
               }}
-              className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
+              className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg px-4 py-2.5 text-sm text-serene-text dark:text-[#EDE8E0] focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
             />
             {nameError && <p className="text-serene-amber text-xs mt-1 font-sans">{nameError}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">Email Address</label>
+            <label className="block text-xs font-semibold text-serene-muted dark:text-[#A39C8F] uppercase tracking-wider mb-2">Email Address</label>
             <input
               type="email"
               value={email}
@@ -95,13 +95,13 @@ function SignupPage() {
                 setEmail(e.target.value);
                 if (e.target.value.trim()) setEmailError("");
               }}
-              className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
+              className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg px-4 py-2.5 text-sm text-serene-text dark:text-[#EDE8E0] focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
             />
             {emailError && <p className="text-serene-amber text-xs mt-1 font-sans">{emailError}</p>}
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">Password</label>
+            <label className="block text-xs font-semibold text-serene-muted dark:text-[#A39C8F] uppercase tracking-wider mb-2">Password</label>
             <input
               type="password"
               value={password}
@@ -109,7 +109,7 @@ function SignupPage() {
                 setPassword(e.target.value);
                 if (e.target.value.trim()) setPasswordError("");
               }}
-              className="w-full bg-serene-bg border border-serene-border rounded-lg px-4 py-2.5 text-sm text-serene-text focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
+              className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg px-4 py-2.5 text-sm text-serene-text dark:text-[#EDE8E0] focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
             />
             {passwordError && <p className="text-serene-amber text-xs mt-1 font-sans">{passwordError}</p>}
           </div>

@@ -200,7 +200,7 @@ export default function Home() {
           {/* Left Column (flex 1) */}
           <div className="flex-1 w-full flex flex-col">
             {/* Mood check-in card */}
-            <div className="bg-white border border-serene-border rounded-[16px] p-7 w-full">
+            <div className="bg-white dark:bg-[#25232A] border border-serene-border rounded-[16px] p-7 w-full">
               <h2 className="font-serif text-[20px] font-semibold text-serene-text">
                 How are you feeling today?
               </h2>

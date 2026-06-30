@@ -98,7 +98,7 @@ export default function GratitudePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Column 1: Today's check-in */}
         <div className="flex flex-col gap-4 animate-fade-in-up">
-          <Card className="border-serene-border p-7 bg-white">
+          <Card className="border-serene-border p-7 bg-white dark:bg-[#25232A]">
             <h2 className="font-serif text-[16px] text-serene-text font-semibold mb-4.5">
               Today's highlights
             </h2>

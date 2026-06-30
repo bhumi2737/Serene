@@ -100,7 +100,7 @@ export default function ChatPage() {
               >
                 <div
                   className={`max-w-[75%] rounded-lg px-4 py-2.5 text-sm leading-relaxed ${isUser
-                      ? "bg-serene-primary text-white"
+                      ? "bg-serene-primary text-white dark:bg-[#4A7C59] dark:text-white"
                       : "bg-serene-surface border border-serene-border text-serene-text font-serif"
                     }`}
                 >

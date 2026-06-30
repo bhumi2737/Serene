@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -11,6 +11,7 @@ import GratitudePage from "./pages/GratitudePage";
 import InsightsPage from "./pages/InsightsPage";
 import JournalNewPage from "./pages/JournalNewPage";
 import Profile from "./pages/Profile";
+import { checkAndFireReminder } from "./utils/notifications";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("serene_token");
@@ -21,6 +22,14 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
+  useEffect(() => {
+    checkAndFireReminder();
+    const interval = setInterval(() => {
+      checkAndFireReminder();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Routes>
       {/* Unprotected routes */}

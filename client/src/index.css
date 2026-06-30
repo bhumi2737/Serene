@@ -18,6 +18,18 @@ html {
   --border: #D8CBB5;
 }
 
+.dark {
+  --bg: #1C1B1F;
+  --surface: #25232A;
+  --primary: #EDE8E0;
+  --primary-soft: #2A2830;
+  --secondary: #3A3742;
+  --accent: #D4A373;
+  --text: #EDE8E0;
+  --muted: #A39C8F;
+  --border: #3A3742;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

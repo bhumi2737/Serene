@@ -74,7 +74,7 @@ export default function JournalPage() {
           </p>
           <button
             onClick={() => navigate("/journal/new")}
-            className="bg-serene-primary text-white text-xs font-semibold px-5 py-2.5 rounded-lg mt-6 hover:bg-opacity-90 transition-all font-sans"
+            className="bg-serene-primary dark:bg-[#4A7C59] text-white text-xs font-semibold px-5 py-2.5 rounded-lg mt-6 hover:bg-opacity-90 transition-all font-sans"
           >
             Write your first entry
           </button>

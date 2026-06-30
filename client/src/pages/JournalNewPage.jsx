@@ -92,7 +92,7 @@ export default function JournalNewPage() {
                 if (e.target.value.trim()) setTitleError("");
               }}
               placeholder="Title of reflection"
-              className="w-full bg-transparent border-b border-serene-border py-3 text-xl font-semibold text-serene-primary placeholder-serene-muted focus:outline-none focus:border-serene-primary font-serif"
+              className="w-full bg-transparent border-b border-serene-border dark:border-[#3A3742] py-3 text-xl font-semibold text-serene-primary dark:text-[#EDE8E0] placeholder-serene-muted dark:placeholder-[#A39C8F] focus:outline-none focus:border-serene-primary font-serif"
             />
             {titleError && <p className="text-serene-amber text-xs mt-1 font-sans">{titleError}</p>}
           </div>
@@ -112,8 +112,8 @@ export default function JournalNewPage() {
                     onClick={() => setEmotion(emo)}
                     className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
                       isActive
-                        ? "bg-serene-primarySoft border-serene-primary text-serene-primary font-semibold"
-                        : "bg-serene-bg border-serene-border text-serene-text hover:border-serene-muted"
+                        ? "bg-serene-primarySoft dark:bg-[#2A2830] border-serene-primary dark:border-[#3A3742] text-serene-primary dark:text-[#EDE8E0] font-semibold"
+                        : "bg-serene-bg dark:bg-[#1C1B1F] border-serene-border dark:border-[#3A3742] text-serene-text dark:text-[#EDE8E0] hover:border-serene-muted"
                     }`}
                   >
                     {emo}
@@ -133,7 +133,7 @@ export default function JournalNewPage() {
               }}
               placeholder="Start writing freely..."
               rows={12}
-              className="w-full bg-serene-bg border border-serene-border rounded-lg p-4 text-sm text-serene-text leading-relaxed font-serif focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none"
+              className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg p-4 text-sm text-serene-text dark:text-[#EDE8E0] leading-relaxed font-serif focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none"
             />
             {bodyError && <p className="text-serene-amber text-xs mt-1 font-sans">{bodyError}</p>}
           </div>

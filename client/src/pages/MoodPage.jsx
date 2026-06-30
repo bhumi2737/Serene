@@ -4,6 +4,7 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
 import { Smile, Check, AlertCircle } from "lucide-react";
+import { getTheme } from "../utils/theme";
 
 const moods = [
   { emoji: "😔", label: "Low", value: 1, color: "#66736F" },
@@ -26,6 +27,7 @@ export default function MoodPage() {
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
   const [history, setHistory] = useState([]);
+  const isDark = getTheme() === "dark";
 
   // Compute Monday of the current week (Monday to Sunday)
   const today = new Date();
@@ -196,14 +198,14 @@ export default function MoodPage() {
                   const y = 100 - barHeight;
                   const x = 35 + idx * 95; // 7 bars distributed
                   
-                  // Past days with no entry get a lighter fill (#EDE8DC)
+                  // Past days with no entry get a lighter fill
                   // Today's bar gets a darker fill (#4A7C59)
-                  // Past days with entries get #D4CDB8
-                  let fill = "#EDE8DC";
+                  // Past days with entries get secondary border color
+                  let fill = isDark ? "#25232A" : "#EDE8DC";
                   if (day.isToday) {
                     fill = "#4A7C59";
                   } else if (entry) {
-                    fill = "#D4CDB8";
+                    fill = isDark ? "#3A3742" : "#D4CDB8";
                   }
 
                   return (

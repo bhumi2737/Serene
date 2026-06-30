@@ -4,6 +4,7 @@ import AppShell from "../components/AppShell";
 import Card from "../components/Card";
 import StatItem from "../components/StatItem";
 import PageHeader from "../components/PageHeader";
+import { getTheme } from "../utils/theme";
 
 const emotionSummary = [
   { label: "Hopeful", count: 5, bg: "bg-[#EEF5E8]", text: "text-[#3B6D11]", fill: "w-[100%]" },
@@ -67,6 +68,8 @@ export default function InsightsPage() {
   const [reportRange, setReportRange] = useState("weekly");
   const [isGenerating, setIsGenerating] = useState(false);
   const [reportError, setReportError] = useState("");
+  const isDark = getTheme() === "dark";
+  const inactiveColor = isDark ? "#3A3742" : "#D4CDB8";
 
   const [moods, setMoods] = useState([]);
   const [journals, setJournals] = useState([]);
@@ -348,19 +351,19 @@ export default function InsightsPage() {
             <div className="h-64 w-full flex items-center justify-center">
               <svg viewBox="0 0 600 140" className="w-full h-full text-serene-muted select-none">
                 {/* Horizontal grid lines for Y-axis markers */}
-                <line x1="0" y1="10" x2="600" y2="10" stroke="#D4CDB8" strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="30" x2="600" y2="30" stroke="#D4CDB8" strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="50" x2="600" y2="50" stroke="#D4CDB8" strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="70" x2="600" y2="70" stroke="#D4CDB8" strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="90" x2="600" y2="90" stroke="#D4CDB8" strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="110" x2="600" y2="110" stroke="#D4CDB8" strokeWidth="1" />
+                <line x1="0" y1="10" x2="600" y2="10" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
+                <line x1="0" y1="30" x2="600" y2="30" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
+                <line x1="0" y1="50" x2="600" y2="50" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
+                <line x1="0" y1="70" x2="600" y2="70" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
+                <line x1="0" y1="90" x2="600" y2="90" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
+                <line x1="0" y1="110" x2="600" y2="110" stroke={inactiveColor} strokeWidth="1" />
 
                 {moodSeries.map((item, i) => {
                   const x = i * 20 + 3;
                   const isRecent = i >= 23;
                   const height = item.moodValue === 0 ? 2 : (item.moodValue / 5) * 100;
                   const y = 110 - height;
-                  const fill = item.moodValue === 0 ? "#D4CDB8" : (isRecent ? "#4A7C59" : "#D4CDB8");
+                  const fill = item.moodValue === 0 ? inactiveColor : (isRecent ? "#4A7C59" : inactiveColor);
                   const showLabel = i % 5 === 0;
                   
                   let labelText = "";
