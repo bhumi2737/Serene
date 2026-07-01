@@ -4,6 +4,7 @@ import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import { ChevronLeft, Save } from "lucide-react";
+import { createJournal } from "../utils/api";
 
 const emotions = ["Calm", "Hopeful", "Anxious", "Sad", "Grateful"];
 
@@ -13,13 +14,16 @@ export default function JournalNewPage() {
   const [text, setText] = useState("");
   const [emotion, setEmotion] = useState("Calm");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const [titleError, setTitleError] = useState("");
   const [bodyError, setBodyError] = useState("");
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setTitleError("");
     setBodyError("");
+    setError("");
 
     let hasError = false;
     if (!title.trim()) {
@@ -32,22 +36,18 @@ export default function JournalNewPage() {
     }
     if (hasError) return;
 
-    const stored = localStorage.getItem("serene_journals");
-    const existing = stored ? JSON.parse(stored) : [];
-
-    const newEntry = {
-      date: new Date().toISOString().split("T")[0],
-      title: title.trim(),
-      body: text.trim(),
-    };
-
-    const updated = [...existing, newEntry];
-    localStorage.setItem("serene_journals", JSON.stringify(updated));
-
-    setSaved(true);
-    setTimeout(() => {
-      navigate("/journal");
-    }, 500);
+    setSaving(true);
+    const today = new Date().toISOString().split("T")[0];
+    try {
+      await createJournal(today, title.trim(), text.trim());
+      setSaved(true);
+      setTimeout(() => {
+        navigate("/journal");
+      }, 500);
+    } catch (err) {
+      setError(err.message || "Failed to save entry.");
+      setSaving(false);
+    }
   };
 
   return (
@@ -62,14 +62,21 @@ export default function JournalNewPage() {
         >
           Back to list
         </Button>
-        <Button
-          variant="primary"
-          icon={Save}
-          disabled={saved}
-          onClick={handleSave}
-        >
-          {saved ? "Saved" : "Save Entry"}
-        </Button>
+        <div className="flex flex-col items-end">
+          <Button
+            variant="primary"
+            icon={Save}
+            disabled={saving || saved}
+            onClick={handleSave}
+          >
+            {saving ? "Saving..." : (saved ? "Saved" : "Save Entry")}
+          </Button>
+          {error && (
+            <span className="text-serene-amber text-xs mt-1.5 font-sans font-medium">
+              {error}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="max-w-2xl mx-auto">

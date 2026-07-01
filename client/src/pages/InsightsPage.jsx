@@ -5,6 +5,7 @@ import Card from "../components/Card";
 import StatItem from "../components/StatItem";
 import PageHeader from "../components/PageHeader";
 import { getTheme } from "../utils/theme";
+import { getMoods, getJournals, getGratitude } from "../utils/api";
 
 const emotionSummary = [
   { label: "Hopeful", count: 5, bg: "bg-[#EEF5E8]", text: "text-[#3B6D11]", fill: "w-[100%]" },
@@ -74,32 +75,26 @@ export default function InsightsPage() {
   const [moods, setMoods] = useState([]);
   const [journals, setJournals] = useState([]);
   const [gratitude, setGratitude] = useState([]);
-
-  const loadDataFromLocalStorage = () => {
-    const storedMoods = localStorage.getItem("serene_moods");
-    setMoods(storedMoods ? JSON.parse(storedMoods) : []);
-
-    const storedJournals = localStorage.getItem("serene_journals");
-    setJournals(storedJournals ? JSON.parse(storedJournals) : []);
-
-    const storedGratitude = localStorage.getItem("serene_gratitude");
-    setGratitude(storedGratitude ? JSON.parse(storedGratitude) : []);
-  };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadDataFromLocalStorage();
-
-    const handleFocus = () => {
-      loadDataFromLocalStorage();
+    const loadData = async () => {
+      try {
+        const [moodsData, journalsData, gratitudeData] = await Promise.all([
+          getMoods(),
+          getJournals(),
+          getGratitude(),
+        ]);
+        setMoods(moodsData);
+        setJournals(journalsData);
+        setGratitude(gratitudeData);
+      } catch (err) {
+        console.error("Failed to load insights data:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleFocus);
-
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleFocus);
-    };
+    loadData();
   }, []);
 
   const moodSeries = useMemo(() => {
@@ -213,8 +208,8 @@ export default function InsightsPage() {
     });
   }, [gratitude]);
 
-  const currentStreak = useMemo(() => calculateStreak(), [moods]);
-  const longestStreak = useMemo(() => calculateLongestStreak(), [moods]);
+  const currentStreak = useMemo(() => calculateStreak(moods), [moods]);
+  const longestStreak = useMemo(() => calculateLongestStreak(moods), [moods]);
 
   const activeStyle = {
     border: "1px solid #D4CDB8",
@@ -250,16 +245,7 @@ export default function InsightsPage() {
     setIsGenerating(true);
     setReportError("");
     try {
-      const storedMoods = localStorage.getItem("serene_moods");
-      const moodsData = storedMoods ? JSON.parse(storedMoods) : [];
-
-      const storedJournals = localStorage.getItem("serene_journals");
-      const journalsData = storedJournals ? JSON.parse(storedJournals) : [];
-
-      const storedGratitude = localStorage.getItem("serene_gratitude");
-      const gratitudeData = storedGratitude ? JSON.parse(storedGratitude) : [];
-
-      const streakVal = calculateStreak();
+      const streakVal = calculateStreak(moods);
 
       const response = await fetch("http://localhost:5000/api/report/generate", {
         method: "POST",
@@ -268,9 +254,9 @@ export default function InsightsPage() {
         },
         body: JSON.stringify({
           range: reportRange,
-          moods: moodsData,
-          journals: journalsData,
-          gratitude: gratitudeData,
+          moods,
+          journals,
+          gratitude,
           streak: streakVal,
         }),
       });
@@ -304,6 +290,18 @@ export default function InsightsPage() {
     const format = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     return `${format(start)} – ${format(end)}`;
   };
+
+  if (loading) {
+    return (
+      <AppShell>
+        <PageHeader
+          title="Insights"
+          subtitle="Understand your emotional trends and notice patterns over time"
+        />
+        <div className="p-6 text-sm text-serene-muted">Loading insights and trends...</div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>

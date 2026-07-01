@@ -5,8 +5,9 @@ import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
 import { Smile, Check, AlertCircle } from "lucide-react";
 import { getTheme } from "../utils/theme";
+import { getMoods, saveMood } from "../utils/api";
 
-const moods = [
+const moodsList = [
   { emoji: "😔", label: "Low", value: 1, color: "#66736F" },
   { emoji: "😐", label: "Okay", value: 2, color: "#A9C7E8" },
   { emoji: "😊", label: "Good", value: 3, color: "#DCEBE4" },
@@ -23,10 +24,12 @@ const moodValueMap = {
 };
 
 export default function MoodPage() {
-  const [selectedMood, setSelectedMood] = useState(null);
+  const [selectedMood, setSelectedMood] = useState("");
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
-  const [history, setHistory] = useState([]);
+  const [moods, setMoods] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const isDark = getTheme() === "dark";
 
   // Compute Monday of the current week (Monday to Sunday)
@@ -55,55 +58,91 @@ export default function MoodPage() {
 
   // Load mood entries on mount
   useEffect(() => {
-    const stored = localStorage.getItem("serene_moods");
-    const currentMoods = stored ? JSON.parse(stored) : [];
-    setHistory(currentMoods);
+    const fetchMoods = async () => {
+      try {
+        setError("");
+        const data = await getMoods();
+        setMoods(data);
 
-    const todayString = today.toISOString().split("T")[0];
-    const todayEntry = currentMoods.find((m) => m.date === todayString);
-    if (todayEntry) {
-      const idx = moods.findIndex((m) => m.label === todayEntry.mood);
-      if (idx > -1) {
-        setSelectedMood(idx);
+        const todayString = today.toISOString().split("T")[0];
+        const todayEntry = data.find((m) => m.date === todayString);
+        if (todayEntry) {
+          setSelectedMood(todayEntry.mood);
+        }
+      } catch (err) {
+        setError(err.message || "Failed to load moods.");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+    fetchMoods();
   }, []);
 
-  const handleMoodClick = (index) => {
-    setSelectedMood(index);
-    const selectedMoodLabel = moods[index].label;
+  const handleMoodClick = async (moodLabel) => {
+    setSelectedMood(moodLabel);
     const todayString = new Date().toISOString().split("T")[0];
-
-    const stored = localStorage.getItem("serene_moods");
-    let currentMoods = stored ? JSON.parse(stored) : [];
-
-    const existingIndex = currentMoods.findIndex((m) => m.date === todayString);
-    if (existingIndex > -1) {
-      currentMoods[existingIndex].mood = selectedMoodLabel;
-    } else {
-      currentMoods.push({ date: todayString, mood: selectedMoodLabel });
+    try {
+      setError("");
+      const savedMood = await saveMood(todayString, moodLabel);
+      setMoods((prev) => {
+        const existingIndex = prev.findIndex((m) => m.date === todayString);
+        if (existingIndex > -1) {
+          const updated = [...prev];
+          updated[existingIndex] = savedMood;
+          return updated;
+        } else {
+          return [...prev, savedMood];
+        }
+      });
+    } catch (err) {
+      setError(err.message || "Failed to save mood.");
     }
-
-    localStorage.setItem("serene_moods", JSON.stringify(currentMoods));
-    setHistory(currentMoods);
   };
 
-  const handleSave = () => {
-    if (selectedMood === null) return;
-    handleMoodClick(selectedMood);
-
-    setSaved(true);
-    setTimeout(() => {
+  const handleSave = async () => {
+    if (!selectedMood) return;
+    const todayString = new Date().toISOString().split("T")[0];
+    try {
+      setError("");
+      setSaved(true);
+      const savedMood = await saveMood(todayString, selectedMood);
+      setMoods((prev) => {
+        const existingIndex = prev.findIndex((m) => m.date === todayString);
+        if (existingIndex > -1) {
+          const updated = [...prev];
+          updated[existingIndex] = savedMood;
+          return updated;
+        } else {
+          return [...prev, savedMood];
+        }
+      });
+      setTimeout(() => {
+        setSaved(false);
+      }, 2000);
+    } catch (err) {
+      setError(err.message || "Failed to save mood.");
       setSaved(false);
-    }, 2000);
+    }
   };
 
   // Filter moods that fall within the current week
   const weeklyMoodsCount = weekDays.reduce((acc, day) => {
-    const entry = history.find((m) => m.date === day.dateStr);
+    const entry = moods.find((m) => m.date === day.dateStr);
     if (entry) acc += 1;
     return acc;
   }, 0);
+
+  if (loading) {
+    return (
+      <AppShell>
+        <PageHeader
+          title="Mood Tracker"
+          subtitle="Log your emotional check-ins to monitor wellness patterns"
+        />
+        <div className="p-6 text-sm text-serene-muted">Loading mood logs...</div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -120,14 +159,20 @@ export default function MoodPage() {
             <h2 className="text-base font-bold text-serene-primary font-serif mb-2">How are you feeling right now?</h2>
             <p className="text-xs text-serene-muted mb-6">Select a mood option below to record your logs.</p>
 
+            {error && (
+              <p className="text-serene-amber text-xs mb-4 font-sans font-medium">
+                {error}
+              </p>
+            )}
+
             {/* Mood selector buttons */}
             <div className="grid grid-cols-5 gap-2 mb-6">
-              {moods.map((mood, i) => {
-                const isSelected = selectedMood === i;
+              {moodsList.map((mood) => {
+                const isSelected = selectedMood === mood.label;
                 return (
                   <button
                     key={mood.label}
-                    onClick={() => handleMoodClick(i)}
+                    onClick={() => handleMoodClick(mood.label)}
                     className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
                       isSelected
                         ? "border-serene-primary bg-serene-primarySoft text-serene-primary font-semibold"
@@ -142,7 +187,7 @@ export default function MoodPage() {
             </div>
 
             {/* Conditional note and submit triggers */}
-            {selectedMood !== null && (
+            {selectedMood !== "" && (
               <div className="border-t border-serene-border pt-5 animate-fade-in">
                 <label className="block text-xs font-semibold text-serene-muted uppercase tracking-wider mb-2">
                   Add optional reflections or context
@@ -173,7 +218,7 @@ export default function MoodPage() {
           <div className="flex items-center gap-3 p-4 bg-serene-primarySoft/30 border border-serene-border rounded-lg text-xs text-serene-text">
             <AlertCircle className="w-4 h-4 text-serene-primary flex-shrink-0" />
             <p className="leading-relaxed">
-              <strong>Wellness note:</strong> Tracking your mood can build self-reflection and emotional awareness. This visualization reflects mock dashboard logs for demonstration purposes.
+              <strong>Wellness note:</strong> Tracking your mood can build self-reflection and emotional awareness. This visualization reflects database logs for your profile.
             </p>
           </div>
         </div>
@@ -192,15 +237,12 @@ export default function MoodPage() {
             <div className="h-44 w-full flex flex-col justify-end">
               <svg width="100%" height="100" viewBox="0 0 700 100" preserveAspectRatio="none" className="overflow-visible">
                 {weekDays.map((day, idx) => {
-                  const entry = history.find((m) => m.date === day.dateStr);
+                  const entry = moods.find((m) => m.date === day.dateStr);
                   const val = entry ? moodValueMap[entry.mood] || 0 : 0;
                   const barHeight = val * 20; // scaled to a max height of 100px (5 * 20)
                   const y = 100 - barHeight;
                   const x = 35 + idx * 95; // 7 bars distributed
                   
-                  // Past days with no entry get a lighter fill
-                  // Today's bar gets a darker fill (#4A7C59)
-                  // Past days with entries get secondary border color
                   let fill = isDark ? "#25232A" : "#EDE8DC";
                   if (day.isToday) {
                     fill = "#4A7C59";

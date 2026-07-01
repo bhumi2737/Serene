@@ -1,7 +1,4 @@
-export function calculateStreak() {
-  const stored = localStorage.getItem("serene_moods");
-  const moods = stored ? JSON.parse(stored) : [];
-
+export function calculateStreak(moods = []) {
   let streak = 0;
   let checkDate = new Date();
 
@@ -23,10 +20,8 @@ export function calculateStreak() {
   return streak;
 }
 
-export function calculateLongestStreak() {
-  const stored = localStorage.getItem("serene_moods");
-  const moods = stored ? JSON.parse(stored) : [];
-  if (moods.length === 0) {
+export function calculateLongestStreak(moods = []) {
+  if (!moods || moods.length === 0) {
     return 0;
   }
 
@@ -50,4 +45,3 @@ export function calculateLongestStreak() {
 
   return longestRun;
 }
-

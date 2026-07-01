@@ -35,19 +35,18 @@ const userSchema = new mongoose.Schema(
 
 // Hash password BEFORE saving to database
 // This runs automatically whenever a user is saved
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   // Only hash if password was changed (not on other updates)
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password")) return;
 
   // If password is already hashed, skip hashing it again
   if (this.password && (this.password.startsWith("$2a$") || this.password.startsWith("$2b$") || this.password.startsWith("$2y$"))) {
-    return next();
+    return;
   }
 
   // "salt" makes hashing more secure (10 = complexity level)
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 // Method to compare entered password with hashed password in DB

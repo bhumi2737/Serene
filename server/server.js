@@ -21,6 +21,15 @@ app.use(express.json()); // Allows backend to read JSON from requests
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
+
+const moodRoutes = require("./routes/moodRoutes");
+const journalRoutes = require("./routes/journalRoutes");
+const gratitudeRoutes = require("./routes/gratitudeRoutes");
+
+app.use("/api/moods", moodRoutes);
+app.use("/api/journals", journalRoutes);
+app.use("/api/gratitude", gratitudeRoutes);
+
 const reportRoutes = require("./routes/reportRoutes");
 app.use("/api/report", reportRoutes);
 

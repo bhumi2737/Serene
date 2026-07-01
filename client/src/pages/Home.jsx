@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AppShell from "../components/AppShell";
 import { calculateStreak } from "../utils/streak";
+import { getMoods, getJournals, getGratitude, saveMood } from "../utils/api";
 
-const moods = [
+const moodsList = [
   { emoji: "😔", label: "Low" },
   { emoji: "😐", label: "Okay" },
   { emoji: "😊", label: "Good" },
@@ -25,15 +26,11 @@ export default function Home() {
   const [selectedMood, setSelectedMood] = useState(null);
   const [moodSaved, setMoodSaved] = useState(false);
 
-  // States to trigger re-renders or updates for calculations
-  const [weeklyStats, setWeeklyStats] = useState({
-    journalCount: 0,
-    gratitudeCount: 0,
-    moodCount: 0,
-    avgMoodLabel: "No data yet",
-    avgMoodEmoji: "",
-    streakCount: 0,
-  });
+  // API loaded states
+  const [moods, setMoods] = useState([]);
+  const [journals, setJournals] = useState([]);
+  const [gratitude, setGratitude] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -48,120 +45,125 @@ export default function Home() {
     day: "numeric",
   }).toUpperCase();
 
-  const loadWeeklyStats = () => {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const monday = new Date(today);
-    monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
-    monday.setHours(0, 0, 0, 0);
-
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
-
-    const mondayString = monday.toISOString().split("T")[0];
-    const sundayString = sunday.toISOString().split("T")[0];
-
-    const storedJournals = localStorage.getItem("serene_journals");
-    const journals = storedJournals ? JSON.parse(storedJournals) : [];
-    const journalCount = journals.filter(
-      (entry) => entry.date >= mondayString && entry.date <= sundayString
-    ).length;
-
-    const storedGratitude = localStorage.getItem("serene_gratitude");
-    const gratitude = storedGratitude ? JSON.parse(storedGratitude) : [];
-    const gratitudeCount = gratitude.filter(
-      (entry) => entry.date >= mondayString && entry.date <= sundayString
-    ).length;
-
-    const storedMoods = localStorage.getItem("serene_moods");
-    const moodsList = storedMoods ? JSON.parse(storedMoods) : [];
-    const moodCount = moodsList.filter(
-      (entry) => entry.date >= mondayString && entry.date <= sundayString
-    ).length;
-
-    // Average mood
-    const weeklyMoodEntries = moodsList.filter(
-      (entry) => entry.date >= mondayString && entry.date <= sundayString
-    );
-    let avgMoodLabel = "No data yet";
-    let avgMoodEmoji = "";
-
-    if (weeklyMoodEntries.length > 0) {
-      const totalScore = weeklyMoodEntries.reduce((sum, entry) => {
-        const val = moodValueMap[entry.mood] || 0;
-        return sum + val;
-      }, 0);
-      const avgScore = Math.round(totalScore / weeklyMoodEntries.length);
-      
-      const moodLabels = ["Low", "Okay", "Good", "Great", "Amazing"];
-      const moodEmojis = ["😔", "😐", "😊", "😄", "🤩"];
-      if (avgScore >= 1 && avgScore <= 5) {
-        avgMoodLabel = moodLabels[avgScore - 1];
-        avgMoodEmoji = moodEmojis[avgScore - 1];
-      }
-    }
-
-    const streakCount = calculateStreak();
-
-    setWeeklyStats({
-      journalCount,
-      gratitudeCount,
-      moodCount,
-      avgMoodLabel,
-      avgMoodEmoji,
-      streakCount,
-    });
-  };
-
   useEffect(() => {
     const name = localStorage.getItem("userName");
     if (name) setUserName(name);
 
-    // Load initial weekly stats
-    loadWeeklyStats();
+    const loadData = async () => {
+      try {
+        const [moodsData, journalsData, gratitudeData] = await Promise.all([
+          getMoods(),
+          getJournals(),
+          getGratitude(),
+        ]);
+        setMoods(moodsData);
+        setJournals(journalsData);
+        setGratitude(gratitudeData);
 
-    // Pre-select today's mood
-    const stored = localStorage.getItem("serene_moods");
-    if (stored) {
-      const currentMoods = JSON.parse(stored);
-      const todayString = new Date().toISOString().split("T")[0];
-      const todayEntry = currentMoods.find((m) => m.date === todayString);
-      if (todayEntry) {
-        const idx = moods.findIndex((m) => m.label === todayEntry.mood);
-        if (idx > -1) {
-          setSelectedMood(idx);
+        // Pre-select today's mood
+        const todayString = new Date().toISOString().split("T")[0];
+        const todayEntry = moodsData.find((m) => m.date === todayString);
+        if (todayEntry) {
+          const idx = moodsList.findIndex((m) => m.label === todayEntry.mood);
+          if (idx > -1) {
+            setSelectedMood(idx);
+          }
         }
+      } catch (err) {
+        console.error("Failed to load dashboard data:", err);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+    loadData();
   }, []);
 
-  const handleMoodSelect = (index) => {
+  const handleMoodSelect = async (index) => {
     setSelectedMood(index);
     setMoodSaved(true);
 
-    const selectedMoodLabel = moods[index].label;
+    const selectedMoodLabel = moodsList[index].label;
     const todayString = new Date().toISOString().split("T")[0];
 
-    const stored = localStorage.getItem("serene_moods");
-    let currentMoods = stored ? JSON.parse(stored) : [];
-
-    const existingIndex = currentMoods.findIndex((m) => m.date === todayString);
-    if (existingIndex > -1) {
-      currentMoods[existingIndex].mood = selectedMoodLabel;
-    } else {
-      currentMoods.push({ date: todayString, mood: selectedMoodLabel });
+    try {
+      const savedMood = await saveMood(todayString, selectedMoodLabel);
+      setMoods((prev) => {
+        const existingIndex = prev.findIndex((m) => m.date === todayString);
+        if (existingIndex > -1) {
+          const updated = [...prev];
+          updated[existingIndex] = savedMood;
+          return updated;
+        } else {
+          return [...prev, savedMood];
+        }
+      });
+    } catch (err) {
+      console.error("Failed to save mood:", err);
     }
-
-    localStorage.setItem("serene_moods", JSON.stringify(currentMoods));
-
-    // Reload weekly stats directly to reflect changes immediately
-    loadWeeklyStats();
 
     setTimeout(() => {
       setMoodSaved(false);
     }, 3000);
   };
+
+  // Compute Monday of the current week (Monday to Sunday)
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+
+  const mondayString = monday.toISOString().split("T")[0];
+  const sundayString = sunday.toISOString().split("T")[0];
+
+  // Compute weekly statistics dynamically
+  const journalCount = journals.filter(
+    (entry) => entry.date >= mondayString && entry.date <= sundayString
+  ).length;
+
+  const gratitudeCount = gratitude.filter(
+    (entry) => entry.date >= mondayString && entry.date <= sundayString
+  ).length;
+
+  const moodCount = moods.filter(
+    (entry) => entry.date >= mondayString && entry.date <= sundayString
+  ).length;
+
+  const weeklyMoodEntries = moods.filter(
+    (entry) => entry.date >= mondayString && entry.date <= sundayString
+  );
+
+  let avgMoodLabel = "No data yet";
+  let avgMoodEmoji = "";
+
+  if (weeklyMoodEntries.length > 0) {
+    const totalScore = weeklyMoodEntries.reduce((sum, entry) => {
+      const val = moodValueMap[entry.mood] || 0;
+      return sum + val;
+    }, 0);
+    const avgScore = Math.round(totalScore / weeklyMoodEntries.length);
+    
+    const moodLabels = ["Low", "Okay", "Good", "Great", "Amazing"];
+    const moodEmojis = ["😔", "😐", "😊", "😄", "🤩"];
+    if (avgScore >= 1 && avgScore <= 5) {
+      avgMoodLabel = moodLabels[avgScore - 1];
+      avgMoodEmoji = moodEmojis[avgScore - 1];
+    }
+  }
+
+  const streakCount = calculateStreak(moods);
+
+  if (loading) {
+    return (
+      <AppShell>
+        <div className="p-6 text-sm text-serene-muted">Loading your wellness dashboard...</div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -210,7 +212,7 @@ export default function Home() {
 
               {/* 5 Mood buttons */}
               <div className="grid grid-cols-5 gap-3">
-                {moods.map((mood, idx) => {
+                {moodsList.map((mood, idx) => {
                   const isSelected = selectedMood === idx;
                   return (
                     <div
@@ -234,7 +236,7 @@ export default function Home() {
               {/* Saved Success Notice */}
               {moodSaved && (
                 <div className="mt-4 p-3 bg-serene-deep border border-serene-border rounded-lg text-center text-xs text-serene-text font-medium animate-fade-in">
-                  Check-in saved: Feeling {moods[selectedMood].label} today.
+                  Check-in saved: Feeling {moodsList[selectedMood].label} today.
                 </div>
               )}
             </div>
@@ -315,16 +317,16 @@ export default function Home() {
               {/* Stat 1 */}
               <div>
                 <div className="flex items-center gap-1.5">
-                  {weeklyStats.avgMoodEmoji && <span className="text-[24px]">{weeklyStats.avgMoodEmoji}</span>}
+                  {avgMoodEmoji && <span className="text-[24px]">{avgMoodEmoji}</span>}
                   <span className="font-serif text-[28px] font-bold text-serene-text">
-                    {weeklyStats.avgMoodLabel}
+                    {avgMoodLabel}
                   </span>
                 </div>
                 <p className="text-[13px] text-serene-muted leading-tight mt-0.5">
                   Average mood this week
                 </p>
                 <span className="block text-[12px] text-serene-muted mt-0.5">
-                  Based on past 7 days (demo data)
+                  Based on current logs
                 </span>
               </div>
 
@@ -332,7 +334,7 @@ export default function Home() {
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="font-serif text-[36px] font-bold text-serene-text">
-                    {weeklyStats.journalCount}
+                    {journalCount}
                   </span>
                   <span className="font-serif text-[24px] text-serene-text">entries</span>
                 </div>
@@ -340,7 +342,7 @@ export default function Home() {
                   Journal Logs
                 </p>
                 <span className="block text-[12px] text-serene-muted mt-0.5">
-                  This week (demo data)
+                  This week
                 </span>
               </div>
 
@@ -348,7 +350,7 @@ export default function Home() {
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="font-serif text-[36px] font-bold text-serene-text">
-                    {weeklyStats.gratitudeCount}
+                    {gratitudeCount}
                   </span>
                   <span className="font-serif text-[24px] text-serene-text">logs</span>
                 </div>
@@ -356,7 +358,7 @@ export default function Home() {
                   Gratitude Check-ins
                 </p>
                 <span className="block text-[12px] text-serene-muted mt-0.5">
-                  This week (demo data)
+                  This week
                 </span>
               </div>
 
@@ -364,7 +366,7 @@ export default function Home() {
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="font-serif text-[36px] font-bold text-serene-text">
-                    {weeklyStats.streakCount}
+                    {streakCount}
                   </span>
                   <span className="font-serif text-[24px] text-serene-text">days</span>
                 </div>
@@ -372,7 +374,7 @@ export default function Home() {
                   Active Streak
                 </p>
                 <span className="block text-[12px] text-serene-muted mt-0.5">
-                  Consistent check-ins (demo data)
+                  Consistent check-ins
                 </span>
               </div>
             </div>

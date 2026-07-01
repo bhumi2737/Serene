@@ -4,74 +4,73 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
 import { Heart } from "lucide-react";
+import { getGratitude, saveGratitude } from "../utils/api";
 
 export default function GratitudePage() {
-  const [inputs, setInputs] = useState(["", "", ""]);
-  const [pastEntries, setPastEntries] = useState([]);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  
+  const [item1, setItem1] = useState("");
+  const [item2, setItem2] = useState("");
+  const [item3, setItem3] = useState("");
 
   useEffect(() => {
-    const stored = localStorage.getItem("serene_gratitude");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      // Sort by date descending
-      const sorted = parsed.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setPastEntries(sorted);
-    } else {
-      setPastEntries([]);
-    }
+    const fetchGratitude = async () => {
+      try {
+        setError("");
+        const data = await getGratitude();
+        setEntries(data);
+
+        const todayString = new Date().toISOString().split("T")[0];
+        const todayEntry = data.find((e) => e.date === todayString);
+        if (todayEntry) {
+          setItem1(todayEntry.items[0] || "");
+          setItem2(todayEntry.items[1] || "");
+          setItem3(todayEntry.items[2] || "");
+        }
+      } catch (err) {
+        setError(err.message || "Failed to load gratitude logs.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGratitude();
   }, []);
 
-  const handleChange = (index, value) => {
-    const nextInputs = [...inputs];
-    nextInputs[index] = value;
-    setInputs(nextInputs);
-    setErrorMsg("");
-  };
-
-  const handleSave = () => {
-    setErrorMsg("");
+  const handleSave = async () => {
+    setError("");
     setSuccess(false);
 
-    const item1 = inputs[0] || "";
-    const item2 = inputs[1] || "";
-    const item3 = inputs[2] || "";
-
     if (!item1.trim() && !item2.trim() && !item3.trim()) {
-      setErrorMsg("Please add at least one item.");
+      setError("Please add at least one item.");
       return;
     }
 
-    const stored = localStorage.getItem("serene_gratitude");
-    let currentEntries = stored ? JSON.parse(stored) : [];
-
     const todayString = new Date().toISOString().split("T")[0];
-    const newEntry = {
-      date: todayString,
-      items: [item1.trim(), item2.trim(), item3.trim()],
-    };
+    try {
+      const itemsList = [item1.trim(), item2.trim(), item3.trim()];
+      const savedLog = await saveGratitude(todayString, itemsList);
 
-    const existingIndex = currentEntries.findIndex((e) => e.date === todayString);
-    if (existingIndex > -1) {
-      currentEntries[existingIndex] = newEntry;
-    } else {
-      currentEntries.push(newEntry);
+      setEntries((prev) => {
+        const existingIndex = prev.findIndex((e) => e.date === todayString);
+        if (existingIndex > -1) {
+          const updated = [...prev];
+          updated[existingIndex] = savedLog;
+          return updated;
+        } else {
+          return [...prev, savedLog];
+        }
+      });
+
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2500);
+    } catch (err) {
+      setError(err.message || "Failed to save gratitude log.");
     }
-
-    localStorage.setItem("serene_gratitude", JSON.stringify(currentEntries));
-
-    // Sort and update past entries list
-    const sorted = [...currentEntries].sort((a, b) => new Date(b.date) - new Date(a.date));
-    setPastEntries(sorted);
-
-    // Clear inputs & show success
-    setInputs(["", "", ""]);
-    setSuccess(true);
-
-    setTimeout(() => {
-      setSuccess(false);
-    }, 2000);
   };
 
   const formatDate = (dateStr) => {
@@ -86,6 +85,21 @@ export default function GratitudePage() {
       return dateStr;
     }
   };
+
+  // Sort entries by date descending for past entries listing
+  const sortedEntries = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if (loading) {
+    return (
+      <AppShell>
+        <PageHeader
+          title="Gratitude"
+          subtitle="Three things you're grateful for today."
+        />
+        <div className="p-6 text-sm text-serene-muted">Loading gratitude logs...</div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell>
@@ -106,30 +120,39 @@ export default function GratitudePage() {
             <div className="flex flex-col gap-3">
               <input
                 type="text"
-                value={inputs[0]}
-                onChange={(e) => handleChange(0, e.target.value)}
+                value={item1}
+                onChange={(e) => {
+                  setItem1(e.target.value);
+                  setError("");
+                }}
                 placeholder="1. I'm grateful for..."
                 className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
               />
               <input
                 type="text"
-                value={inputs[1]}
-                onChange={(e) => handleChange(1, e.target.value)}
+                value={item2}
+                onChange={(e) => {
+                  setItem2(e.target.value);
+                  setError("");
+                }}
                 placeholder="2. I'm grateful for..."
                 className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
               />
               <input
                 type="text"
-                value={inputs[2]}
-                onChange={(e) => handleChange(2, e.target.value)}
+                value={item3}
+                onChange={(e) => {
+                  setItem3(e.target.value);
+                  setError("");
+                }}
                 placeholder="3. I'm grateful for..."
                 className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
               />
             </div>
 
-            {errorMsg && (
+            {error && (
               <p className="text-serene-amber text-xs mt-3 font-sans font-medium">
-                {errorMsg}
+                {error}
               </p>
             )}
 
@@ -154,13 +177,13 @@ export default function GratitudePage() {
             Previous entries
           </h3>
 
-          {pastEntries.length === 0 ? (
+          {sortedEntries.length === 0 ? (
             <p className="text-serene-muted text-sm italic">
               No previous entries yet.
             </p>
           ) : (
             <div className="flex flex-col gap-4">
-              {pastEntries.map((entry, idx) => (
+              {sortedEntries.map((entry, idx) => (
                 <Card key={idx} className="border-serene-border p-5">
                   <span className="block text-[11px] font-bold text-serene-muted tracking-wider uppercase font-sans mb-3">
                     {formatDate(entry.date)}

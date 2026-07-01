@@ -6,7 +6,10 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
     // MONGO_URI comes from .env file
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const uri = process.env.MONGO_URI || "";
+    const maskedUri = uri.replace(/:([^:@]+)@/, ":*****@");
+    console.log(`Connecting to database at URI: ${maskedUri}`);
+    const conn = await mongoose.connect(uri);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     return true;
   } catch (error) {

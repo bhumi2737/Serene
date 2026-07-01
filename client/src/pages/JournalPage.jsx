@@ -5,22 +5,41 @@ import Card from "../components/Card";
 import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
 import { Plus, Calendar } from "lucide-react";
+import { getJournals, deleteJournal } from "../utils/api";
 
 export default function JournalPage() {
   const navigate = useNavigate();
-  const [entries, setEntries] = useState([]);
+  const [journals, setJournals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const stored = localStorage.getItem("serene_journals");
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      // Sort by date descending
-      const sorted = parsed.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setEntries(sorted);
-    } else {
-      setEntries([]);
-    }
+    const fetchJournals = async () => {
+      try {
+        setError("");
+        const data = await getJournals();
+        // Sort by date descending
+        const sorted = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setJournals(sorted);
+      } catch (err) {
+        setError(err.message || "Failed to load journals.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJournals();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this journal entry?")) return;
+    try {
+      setError("");
+      await deleteJournal(id);
+      setJournals((prev) => prev.filter((j) => j._id !== id));
+    } catch (err) {
+      setError(err.message || "Failed to delete entry.");
+    }
+  };
 
   const formatDate = (dateStr) => {
     try {
@@ -43,6 +62,27 @@ export default function JournalPage() {
     return body;
   };
 
+  if (loading) {
+    return (
+      <AppShell>
+        <PageHeader
+          title="Journal"
+          subtitle="Write down your thoughts to discover patterns"
+          actions={
+            <Button
+              variant="primary"
+              icon={Plus}
+              onClick={() => navigate("/journal/new")}
+            >
+              New entry
+            </Button>
+          }
+        />
+        <div className="p-6 text-sm text-serene-muted">Loading journal entries...</div>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       {/* ── PAGE HEADER ── */}
@@ -50,7 +90,7 @@ export default function JournalPage() {
         title="Journal"
         subtitle="Write down your thoughts to discover patterns"
         actions={
-          entries.length > 0 && (
+          journals.length > 0 && (
             <Button
               variant="primary"
               icon={Plus}
@@ -62,8 +102,14 @@ export default function JournalPage() {
         }
       />
 
+      {error && (
+        <p className="text-serene-amber text-xs mt-4 font-sans font-medium">
+          {error}
+        </p>
+      )}
+
       {/* ── JOURNAL GRID AREA ── */}
-      {entries.length === 0 ? (
+      {journals.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-serene-surface border border-serene-border rounded-lg max-w-xl mx-auto mt-8">
           <span className="text-4xl">📓</span>
           <h3 className="text-[18px] font-serif font-bold text-serene-primary mt-4">
@@ -81,13 +127,19 @@ export default function JournalPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-          {entries.map((entry, index) => (
-            <Card key={index} className="hover:border-serene-primarySoft transition-colors flex flex-col justify-between p-6">
+          {journals.map((entry) => (
+            <Card key={entry._id} className="hover:border-serene-primarySoft transition-colors flex flex-col justify-between p-6">
               <div>
                 <div className="flex items-center justify-between gap-4 mb-2">
                   <h3 className="text-base font-bold text-serene-primary font-serif">
                     {entry.title}
                   </h3>
+                  <button
+                    onClick={() => handleDelete(entry._id)}
+                    className="text-serene-amber hover:text-opacity-80 text-xs font-semibold cursor-pointer"
+                  >
+                    Delete
+                  </button>
                 </div>
                 <p className="text-sm text-serene-text leading-relaxed font-serif mb-4 whitespace-pre-line">
                   {getBodyPreview(entry.body)}
