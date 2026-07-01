@@ -4,6 +4,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const { isConnected } = require("../config/db");
 const fileStore = require("../services/fileUserStore");
 const useFileStoreFlag = process.env.USE_FILE_DB === "true";
@@ -33,16 +34,21 @@ const registerUser = async (req, res) => {
     if (!useFile) {
       // Use MongoDB
       const userExists = await User.findOne({ email });
-      if (userExists) return res.status(400).json({ message: "User already exists" });
-      const user = await User.create({ name, email, password });
-      return res.status(201).json({ _id: user._id, name: user.name, email: user.email, token: generateToken(user._id) });
+      if (userExists) return res.status(400).json({ message: "Email already in use." });
+      
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await User.create({ name, email, password: hashedPassword });
+      const token = generateToken(user._id);
+      return res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email } });
     }
 
     // Fallback: file-backed store
     const userExists = await fileStore.findByEmail(email);
-    if (userExists) return res.status(400).json({ message: "User already exists" });
+    if (userExists) return res.status(400).json({ message: "Email already in use." });
+    
     const user = await fileStore.createUser({ name, email, password });
-    return res.status(201).json({ _id: user.id, name: user.name, email: user.email, token: generateToken(user.id) });
+    const token = generateToken(user.id);
+    return res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -60,18 +66,32 @@ const loginUser = async (req, res) => {
     const useFile = useFileStoreFlag || !isConnected();
     if (!useFile) {
       const user = await User.findOne({ email });
-      if (user && (await user.matchPassword(password))) {
-        return res.json({ _id: user._id, name: user.name, email: user.email, token: generateToken(user._id) });
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password." });
       }
-      return res.status(401).json({ message: "Invalid email or password" });
+      
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Invalid email or password." });
+      }
+      
+      const token = generateToken(user._id);
+      return res.status(200).json({ token, user: { id: user._id, name: user.name, email: user.email } });
     }
 
     // Fallback: file store
     const user = await fileStore.findByEmail(email);
-    if (user && (await fileStore.verifyPassword(user, password))) {
-      return res.json({ _id: user.id, name: user.name, email: user.email, token: generateToken(user.id) });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password." });
     }
-    return res.status(401).json({ message: "Invalid email or password" });
+    
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password." });
+    }
+    
+    const token = generateToken(user.id);
+    return res.status(200).json({ token, user: { id: user.id, name: user.name, email: user.email } });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

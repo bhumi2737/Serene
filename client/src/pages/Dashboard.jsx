@@ -8,13 +8,14 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || localStorage.getItem("serene_token");
     if (!token) return;
     api
       .getMe(token)
       .then((data) => setUser(data))
       .catch(() => {
         localStorage.removeItem("token");
+        localStorage.removeItem("serene_token");
       })
       .finally(() => setLoading(false));
   }, []);

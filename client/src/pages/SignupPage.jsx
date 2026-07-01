@@ -49,8 +49,10 @@ function SignupPage() {
       const data = await response.json();
       if (response.ok) {
         localStorage.setItem("serene_token", data.token);
-        if (data.name) localStorage.setItem("userName", data.name);
-        if (data.email) localStorage.setItem("userEmail", data.email);
+        const nameVal = data.name || (data.user && data.user.name);
+        const emailVal = data.email || (data.user && data.user.email);
+        if (nameVal) localStorage.setItem("userName", nameVal);
+        if (emailVal) localStorage.setItem("userEmail", emailVal);
         navigate("/home");
       } else {
         setError(data.message || "Registration failed");
@@ -71,7 +73,7 @@ function SignupPage() {
           <p className="text-xs text-serene-muted dark:text-[#A39C8F] mt-1">A quieter place to understand how you feel</p>
         </div>
 
-        <form onSubmit={handleSignup} className="space-y-5" noValidate>
+        <div className="space-y-5" autoComplete="off">
           <div>
             <label className="block text-xs font-semibold text-serene-muted dark:text-[#A39C8F] uppercase tracking-wider mb-2">Name</label>
             <input
@@ -81,6 +83,7 @@ function SignupPage() {
                 setName(e.target.value);
                 if (e.target.value.trim()) setNameError("");
               }}
+              autoComplete="name"
               className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg px-4 py-2.5 text-sm text-serene-text dark:text-[#EDE8E0] focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
             />
             {nameError && <p className="text-serene-amber text-xs mt-1 font-sans">{nameError}</p>}
@@ -95,6 +98,7 @@ function SignupPage() {
                 setEmail(e.target.value);
                 if (e.target.value.trim()) setEmailError("");
               }}
+              autoComplete="username"
               className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg px-4 py-2.5 text-sm text-serene-text dark:text-[#EDE8E0] focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
             />
             {emailError && <p className="text-serene-amber text-xs mt-1 font-sans">{emailError}</p>}
@@ -109,20 +113,22 @@ function SignupPage() {
                 setPassword(e.target.value);
                 if (e.target.value.trim()) setPasswordError("");
               }}
+              autoComplete="new-password"
               className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg px-4 py-2.5 text-sm text-serene-text dark:text-[#EDE8E0] focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary"
             />
             {passwordError && <p className="text-serene-amber text-xs mt-1 font-sans">{passwordError}</p>}
           </div>
 
           <Button
-            type="submit"
+            type="button"
+            onClick={handleSignup}
             variant="primary"
             disabled={loading}
             className="w-full py-2.5"
           >
             {loading ? "Signing up..." : "Create account"}
           </Button>
-        </form>
+        </div>
 
         {error && (
           <div className="bg-[rgba(220,38,38,0.08)] border border-[rgba(220,38,38,0.2)] rounded-lg p-[10px_14px] text-[#B91C1C] text-[13px] mt-4 font-sans">

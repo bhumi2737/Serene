@@ -9,7 +9,7 @@ function LandingPage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || localStorage.getItem("serene_token");
     if (!token) return;
 
     api
@@ -17,6 +17,7 @@ function LandingPage() {
       .then((data) => setUser(data))
       .catch(() => {
         localStorage.removeItem("token");
+        localStorage.removeItem("serene_token");
         setUser(null);
       });
   }, []);

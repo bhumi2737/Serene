@@ -118,6 +118,7 @@ export default function Profile() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("serene_token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
     navigate("/login");
