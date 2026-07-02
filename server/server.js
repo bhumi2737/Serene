@@ -25,10 +25,13 @@ app.use("/api/auth", require("./routes/authRoutes"));
 const moodRoutes = require("./routes/moodRoutes");
 const journalRoutes = require("./routes/journalRoutes");
 const gratitudeRoutes = require("./routes/gratitudeRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 
 app.use("/api/moods", moodRoutes);
 app.use("/api/journals", journalRoutes);
+app.use("/api/journal", journalRoutes); // Support singular fallback requested by frontend
 app.use("/api/gratitude", gratitudeRoutes);
+app.use("/api/chat", chatRoutes);
 
 const reportRoutes = require("./routes/reportRoutes");
 app.use("/api/report", reportRoutes);

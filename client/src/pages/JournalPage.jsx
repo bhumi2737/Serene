@@ -144,6 +144,44 @@ export default function JournalPage() {
                 <p className="text-sm text-serene-text leading-relaxed font-serif mb-4 whitespace-pre-line">
                   {getBodyPreview(entry.body)}
                 </p>
+                {entry.emotions && entry.emotions.length > 0 && (
+                  <div className="mb-4">
+                    {/* Emotion tags row */}
+                    <div className="flex flex-wrap items-center gap-y-1 mb-2">
+                      {entry.emotions.slice(0, 3).map((emo, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            backgroundColor: "rgba(74, 124, 89, 0.12)",
+                            color: "#4A7C59",
+                            borderRadius: "6px",
+                            padding: "2px 8px",
+                            fontSize: "11px",
+                            marginRight: "4px",
+                          }}
+                          className="inline-block"
+                        >
+                          {emo}
+                        </span>
+                      ))}
+                      {entry.emotions.length > 3 && (
+                        <span className="text-serene-muted text-[11px]">
+                          +{entry.emotions.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                    {/* Summary line */}
+                    {entry.summary && (
+                      <p
+                        className="text-serene-muted italic truncate"
+                        style={{ fontSize: "12px" }}
+                        title={entry.summary}
+                      >
+                        {entry.summary}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Date details */}

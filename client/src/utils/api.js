@@ -94,3 +94,42 @@ export async function saveGratitude(date, items) {
   }
   return data;
 }
+
+export async function sendChatMessage(messages) {
+  const response = await fetch(`${BASE_URL}/chat`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ messages }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to send chat message.");
+  }
+  return data.reply;
+}
+
+export async function analyseJournal(text) {
+  const response = await fetch(`${BASE_URL}/journal/analyse`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify({ text }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to analyse journal.");
+  }
+  return { emotions: data.emotions, summary: data.summary };
+}
+
+export async function updateJournalAnalysis(id, emotions, summary) {
+  const response = await fetch(`${BASE_URL}/journals/${id}/analyse`, {
+    method: "PATCH",
+    headers: getHeaders(),
+    body: JSON.stringify({ emotions, summary }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update journal analysis.");
+  }
+  return data;
+}

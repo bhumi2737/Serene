@@ -20,6 +20,14 @@ const journalSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    emotions: {
+      type: [String],
+      default: [],
+    },
+    summary: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

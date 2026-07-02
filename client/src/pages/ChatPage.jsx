@@ -3,65 +3,43 @@ import AppShell from "../components/AppShell";
 import Card from "../components/Card";
 import Button from "../components/Button";
 import PageHeader from "../components/PageHeader";
-import { Send, AlertTriangle, Sparkles } from "lucide-react";
-
-const aiReplies = [
-  "I hear you. That sounds really difficult. Would you like to talk more about it?",
-  "It's okay to feel that way. You're doing better than you think.",
-  "Take a deep breath. I'm here with you.",
-  "What do you think is making you feel this way?",
-  "That's completely understandable. You don't have to have it all figured out right now.",
-  "You're not alone in this. A lot of people feel the same way.",
-];
-
-const initialMessages = [
-  {
-    id: 1,
-    role: "ai",
-    text: "Hello! I'm Serene's demo companion. I can help with simple conversation prompts. How are you feeling today?",
-    time: "9:00 AM",
-  },
-];
-
-function getCurrentTime() {
-  return new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-}
+import { Send, AlertTriangle } from "lucide-react";
+import { sendChatMessage } from "../utils/api";
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState([
+    { role: "assistant", content: "Hi! I'm your Serene companion. How are you feeling today?" }
+  ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState("");
   const bottomRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const text = input.trim();
     if (!text) return;
 
-    const userMessage = {
-      id: Date.now(),
-      role: "user",
-      text,
-      time: getCurrentTime(),
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setError("");
+    const userMessage = { role: "user", content: text };
+    const updatedMessages = [...messages, userMessage];
 
+    setMessages(updatedMessages);
+    setInput("");
     setIsTyping(true);
-    setTimeout(() => {
-      const randomReply = aiReplies[Math.floor(Math.random() * aiReplies.length)];
-      const aiMessage = {
-        id: Date.now() + 1,
-        role: "ai",
-        text: randomReply,
-        time: getCurrentTime(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+
+    try {
+      const reply = await sendChatMessage(updatedMessages);
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    } catch (err) {
+      console.error("Chat error:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -91,11 +69,11 @@ export default function ChatPage() {
 
         {/* ── CHAT THREAD VIEWPORTS ── */}
         <div className="flex-1 overflow-y-auto pr-2 mb-4 space-y-4">
-          {messages.map((msg) => {
+          {messages.map((msg, index) => {
             const isUser = msg.role === "user";
             return (
               <div
-                key={msg.id}
+                key={index}
                 className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
               >
                 <div
@@ -104,11 +82,8 @@ export default function ChatPage() {
                       : "bg-serene-surface border border-serene-border text-serene-text font-serif"
                     }`}
                 >
-                  {msg.text}
+                  {msg.content}
                 </div>
-                <span className="text-[10px] text-serene-muted mt-1 px-1">
-                  {msg.time}
-                </span>
               </div>
             );
           })}
@@ -124,6 +99,13 @@ export default function ChatPage() {
           )}
           <div ref={bottomRef} />
         </div>
+
+        {/* ── ERROR MESSAGE BANNER ── */}
+        {error && (
+          <p className="text-serene-amber text-xs mb-3 font-sans font-medium">
+            {error}
+          </p>
+        )}
 
         {/* ── FOOTER INPUT FORM ── */}
         <div className="flex items-center gap-2 pt-3 border-t border-serene-border">

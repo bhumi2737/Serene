@@ -4,7 +4,7 @@ import AppShell from "../components/AppShell";
 import Button from "../components/Button";
 import Card from "../components/Card";
 import { ChevronLeft, Save } from "lucide-react";
-import { createJournal } from "../utils/api";
+import { createJournal, analyseJournal, updateJournalAnalysis } from "../utils/api";
 
 const emotions = ["Calm", "Hopeful", "Anxious", "Sad", "Grateful"];
 
@@ -15,6 +15,7 @@ export default function JournalNewPage() {
   const [emotion, setEmotion] = useState("Calm");
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [analysing, setAnalysing] = useState(false);
   const [error, setError] = useState("");
 
   const [titleError, setTitleError] = useState("");
@@ -39,14 +40,24 @@ export default function JournalNewPage() {
     setSaving(true);
     const today = new Date().toISOString().split("T")[0];
     try {
-      await createJournal(today, title.trim(), text.trim());
+      const created = await createJournal(today, title.trim(), text.trim());
+      const id = created._id;
+      setSaving(false);
+      
+      setAnalysing(true);
+      try {
+        const analysis = await analyseJournal(text.trim());
+        await updateJournalAnalysis(id, analysis.emotions, analysis.summary);
+      } catch (analysisErr) {
+        console.error("AI journal analysis failed:", analysisErr);
+      }
+      setAnalysing(false);
       setSaved(true);
-      setTimeout(() => {
-        navigate("/journal");
-      }, 500);
+      navigate("/journal");
     } catch (err) {
       setError(err.message || "Failed to save entry.");
       setSaving(false);
+      setAnalysing(false);
     }
   };
 
@@ -66,10 +77,10 @@ export default function JournalNewPage() {
           <Button
             variant="primary"
             icon={Save}
-            disabled={saving || saved}
+            disabled={saving || analysing || saved}
             onClick={handleSave}
           >
-            {saving ? "Saving..." : (saved ? "Saved" : "Save Entry")}
+            {saving ? "Saving..." : (analysing ? "Analysing..." : (saved ? "Saved" : "Save Entry"))}
           </Button>
           {error && (
             <span className="text-serene-amber text-xs mt-1.5 font-sans font-medium">
