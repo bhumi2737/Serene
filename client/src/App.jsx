@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import ResourcesPage from "./pages/ResourcesPage";
+import SafetyPage from "./pages/SafetyPage";
 import Home from "./pages/Home";
 import MoodPage from "./pages/MoodPage";
 import JournalPage from "./pages/JournalPage";
@@ -36,6 +38,8 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/resources" element={<ResourcesPage />} />
+      <Route path="/safety" element={<SafetyPage />} />
 
       {/* Protected routes */}
       <Route
