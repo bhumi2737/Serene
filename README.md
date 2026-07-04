@@ -33,7 +33,6 @@ The app focuses on creating a peaceful digital space where users can log their m
 | 🌼 Gratitude Log   | Add 3 things you are grateful for each day             |
 | 📊 Weekly Insights | View mood trends and emotional patterns                |
 | 🤖 Serene Chat     | AI-powered supportive chat for reflection              |
-| 🎵 Mood Playlists  | Spotify-based playlist suggestions according to mood   |
 | 📄 Weekly Report   | Download a simple PDF summary of weekly progress       |
 
 ---
@@ -63,7 +62,6 @@ The app focuses on creating a peaceful digital space where users can log their m
 ### Integrations
 
 * Claude API for AI chat and emotional summaries
-* Spotify API for mood-based playlists
 * PDFKit for weekly report generation
 
 ---
