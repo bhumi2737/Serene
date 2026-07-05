@@ -1,4 +1,5 @@
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = `${BASE_URL}/api`;
 
 const getHeaders = () => {
   const token = localStorage.getItem("serene_token");
@@ -9,7 +10,7 @@ const getHeaders = () => {
 };
 
 export async function getMoods() {
-  const response = await fetch(`${BASE_URL}/moods`, {
+  const response = await fetch(`${API_URL}/moods`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -21,7 +22,7 @@ export async function getMoods() {
 }
 
 export async function saveMood(date, mood) {
-  const response = await fetch(`${BASE_URL}/moods`, {
+  const response = await fetch(`${API_URL}/moods`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ date, mood }),
@@ -34,7 +35,7 @@ export async function saveMood(date, mood) {
 }
 
 export async function getJournals() {
-  const response = await fetch(`${BASE_URL}/journals`, {
+  const response = await fetch(`${API_URL}/journals`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -46,7 +47,7 @@ export async function getJournals() {
 }
 
 export async function createJournal(date, title, body) {
-  const response = await fetch(`${BASE_URL}/journals`, {
+  const response = await fetch(`${API_URL}/journals`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ date, title, body }),
@@ -59,7 +60,7 @@ export async function createJournal(date, title, body) {
 }
 
 export async function deleteJournal(id) {
-  const response = await fetch(`${BASE_URL}/journals/${id}`, {
+  const response = await fetch(`${API_URL}/journals/${id}`, {
     method: "DELETE",
     headers: getHeaders(),
   });
@@ -71,7 +72,7 @@ export async function deleteJournal(id) {
 }
 
 export async function getGratitude() {
-  const response = await fetch(`${BASE_URL}/gratitude`, {
+  const response = await fetch(`${API_URL}/gratitude`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -83,7 +84,7 @@ export async function getGratitude() {
 }
 
 export async function saveGratitude(date, items) {
-  const response = await fetch(`${BASE_URL}/gratitude`, {
+  const response = await fetch(`${API_URL}/gratitude`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ date, items }),
@@ -96,7 +97,7 @@ export async function saveGratitude(date, items) {
 }
 
 export async function sendChatMessage(messages) {
-  const response = await fetch(`${BASE_URL}/chat`, {
+  const response = await fetch(`${API_URL}/chat`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ messages }),
@@ -109,7 +110,7 @@ export async function sendChatMessage(messages) {
 }
 
 export async function analyseJournal(text) {
-  const response = await fetch(`${BASE_URL}/journal/analyse`, {
+  const response = await fetch(`${API_URL}/journal/analyse`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ text }),
@@ -122,7 +123,7 @@ export async function analyseJournal(text) {
 }
 
 export async function updateJournalAnalysis(id, emotions, summary) {
-  const response = await fetch(`${BASE_URL}/journals/${id}/analyse`, {
+  const response = await fetch(`${API_URL}/journals/${id}/analyse`, {
     method: "PATCH",
     headers: getHeaders(),
     body: JSON.stringify({ emotions, summary }),

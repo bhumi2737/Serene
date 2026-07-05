@@ -11,8 +11,10 @@ router.get("/", protect, getJournals);
 // POST /api/journals/analyse - Analyse the emotional tone of a journal entry
 router.post("/analyse", protect, analyseJournal);
 
+const { validateJournal } = require("../middleware/validateInput");
+
 // POST /api/journals - Create a new journal entry
-router.post("/", protect, createJournal);
+router.post("/", protect, validateJournal, createJournal);
 
 // PATCH /api/journals/:id/analyse - Update an existing journal entry with analysis results
 router.patch("/:id/analyse", protect, async (req, res) => {

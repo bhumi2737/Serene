@@ -11,6 +11,22 @@ const connectDB = async () => {
     console.log(`Connecting to database at URI: ${maskedUri}`);
     const conn = await mongoose.connect(uri);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+
+    mongoose.connection.on("disconnected", () => {
+      console.log("MongoDB disconnected. Attempting to reconnect...");
+      setTimeout(() => {
+        connectDB();
+      }, 5000);
+    });
+
+    mongoose.connection.on("error", (err) => {
+      console.log(`MongoDB connection error: ${err.message || err}`);
+    });
+
+    mongoose.connection.on("reconnected", () => {
+      console.log("MongoDB reconnected successfully.");
+    });
+
     return true;
   } catch (error) {
     console.error(`Warning: MongoDB connection failed: ${error.message}`);
