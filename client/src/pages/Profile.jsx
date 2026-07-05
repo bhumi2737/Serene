@@ -112,7 +112,7 @@ export default function Profile() {
   const handleDeleteAccount = () => {
     if (window.confirm("Are you sure you want to permanently clear your local reflection logs? This action is irreversible.")) {
       localStorage.clear();
-      navigate("/login");
+      navigate("/");
     }
   };
 
@@ -121,7 +121,7 @@ export default function Profile() {
     localStorage.removeItem("serene_token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
-    navigate("/login");
+    navigate("/");
   };
 
   const firstLetter = name.charAt(0).toUpperCase() || "U";

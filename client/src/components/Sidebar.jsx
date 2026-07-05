@@ -37,7 +37,7 @@ export default function Sidebar() {
     localStorage.removeItem("serene_token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
-    navigate("/login");
+    navigate("/");
   };
 
   return (

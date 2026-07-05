@@ -111,3 +111,287 @@ body {
 .animate-float {
   animation: float 5s ease-in-out infinite;
 }
+
+/* 🌿 Breath guide animation */
+@keyframes breathCycle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+    filter: drop-shadow(0 0 4px rgba(74, 124, 89, 0.15));
+  }
+  25%, 50% {
+    transform: scale(1.4);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 24px rgba(74, 124, 89, 0.35));
+  }
+  75% {
+    transform: scale(1);
+    opacity: 0.5;
+    filter: drop-shadow(0 0 4px rgba(74, 124, 89, 0.15));
+  }
+}
+
+.animate-breath {
+  animation: breathCycle 16s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* 🌊 AI Empathy Wave Visualizer animations */
+@keyframes waveFlow {
+  0% {
+    transform: translateX(0) scaleY(1);
+  }
+  50% {
+    transform: translateX(-25%) scaleY(0.7);
+  }
+  100% {
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+
+.animate-wave-flow-1 {
+  animation: waveFlow 5s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+}
+
+.animate-wave-flow-2 {
+  animation: waveFlow 7s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+  animation-delay: -1.5s;
+}
+
+.animate-wave-flow-3 {
+  animation: waveFlow 9s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+  animation-delay: -3s;
+}
+
+/* 🍃 Floating background leaves */
+@keyframes floatDrift {
+  0% {
+    transform: translateY(-10%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes floatSway {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(40px);
+  }
+}
+
+.animate-leaf-1 {
+  animation: floatDrift 22s linear infinite, floatSway 6s ease-in-out infinite;
+}
+
+.animate-leaf-2 {
+  animation: floatDrift 28s linear infinite, floatSway 8s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+.animate-leaf-3 {
+  animation: floatDrift 35s linear infinite, floatSway 7s ease-in-out infinite;
+  animation-delay: -12s;
+}
+
+.animate-leaf-4 {
+  animation: floatDrift 25s linear infinite, floatSway 9s ease-in-out infinite;
+  animation-delay: -3s;
+}
+
+.animate-leaf-5 {
+  animation: floatDrift 32s linear infinite, floatSway 8s ease-in-out infinite;
+  animation-delay: -18s;
+}
+
+/* ✨ Premium Card Lift & Glow Interactions */
+.hover-lift {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px -5px rgba(62, 53, 41, 0.08), 0 8px 12px -6px rgba(62, 53, 41, 0.05);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 12px 28px -5px rgba(0, 0, 0, 0.3), 0 8px 12px -6px rgba(0, 0, 0, 0.2);
+}
+
+.hover-glow {
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.hover-glow:hover {
+  border-color: rgba(74, 124, 89, 0.4);
+  box-shadow: 0 0 16px rgba(74, 124, 89, 0.08);
+}
+
+.dark .hover-glow:hover {
+  border-color: rgba(237, 232, 224, 0.2);
+  box-shadow: 0 0 16px rgba(237, 232, 224, 0.05);
+}
+
+/* 🌸 Page entrance transition */
+@keyframes pageSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-slide-up {
+  animation: pageSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 🌙 Celestial Window Twinkling & Drifting */
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.animate-star-twinkle-1 {
+  animation: starTwinkle 3s ease-in-out infinite;
+}
+
+.animate-star-twinkle-2 {
+  animation: starTwinkle 4.5s ease-in-out infinite;
+  animation-delay: -1.5s;
+}
+
+.animate-star-twinkle-3 {
+  animation: starTwinkle 6s ease-in-out infinite;
+  animation-delay: -3.5s;
+}
+
+@keyframes cloudDrift {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.animate-cloud-drift-1 {
+  animation: cloudDrift 24s linear infinite;
+}
+
+.animate-cloud-drift-2 {
+  animation: cloudDrift 36s linear infinite;
+  animation-delay: -10s;
+}
+
+/* 🔥 Fireplace Flame Flicker */
+@keyframes fireFlicker {
+  0%, 100% {
+    transform: scaleX(1) scaleY(1) rotate(-1deg);
+    opacity: 0.95;
+    filter: brightness(1);
+  }
+  25% {
+    transform: scaleX(1.1) scaleY(1.2) rotate(1deg);
+    opacity: 1;
+    filter: brightness(1.1);
+  }
+  50% {
+    transform: scaleX(0.92) scaleY(0.98) rotate(-0.5deg);
+    opacity: 0.9;
+    filter: brightness(0.95);
+  }
+  75% {
+    transform: scaleX(1.15) scaleY(1.25) rotate(2deg);
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+}
+
+.animate-flame-1 {
+  animation: fireFlicker 0.42s ease-in-out infinite;
+}
+
+.animate-flame-2 {
+  animation: fireFlicker 0.35s ease-in-out infinite;
+  animation-delay: -0.08s;
+}
+
+.animate-flame-3 {
+  animation: fireFlicker 0.5s ease-in-out infinite;
+  animation-delay: -0.22s;
+}
+
+@keyframes fireAmbientPulse {
+  0%, 100% {
+    box-shadow: 0 0 24px rgba(212, 163, 115, 0.06);
+    background-color: rgba(212, 163, 115, 0.01);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(212, 163, 115, 0.18);
+    background-color: rgba(212, 163, 115, 0.04);
+  }
+}
+
+.animate-fire-glow {
+  animation: fireAmbientPulse 2s ease-in-out infinite;
+}
+
+/* 🌱 Plant Watering drip & tilt */
+@keyframes tiltWaterCan {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  30%, 70% {
+    transform: rotate(-42deg) translate(-4px, 4px);
+  }
+}
+
+.animate-tilt-can {
+  animation: tiltWaterCan 1.5s ease-in-out forwards;
+}
+
+@keyframes waterDrip {
+  0% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(42px);
+    opacity: 0;
+  }
+}
+
+.animate-drip-1 {
+  animation: waterDrip 0.8s ease-in-out infinite;
+}
+
+.animate-drip-2 {
+  animation: waterDrip 0.8s ease-in-out infinite;
+  animation-delay: 0.25s;
+}
+
+.animate-drip-3 {
+  animation: waterDrip 0.8s ease-in-out infinite;
+  animation-delay: 0.5s;
+}

@@ -113,7 +113,7 @@ export default function GratitudePage() {
         {/* Column 1: Today's check-in */}
         <div className="flex flex-col gap-4 animate-fade-in-up">
           <Card className="border-serene-border p-7 bg-white dark:bg-[#25232A]">
-            <h2 className="font-serif text-[16px] text-serene-text font-semibold mb-4.5">
+            <h2 className="font-serif text-[18px] text-serene-text font-semibold mb-4.5">
               Today's highlights
             </h2>
 
@@ -126,7 +126,7 @@ export default function GratitudePage() {
                   setError("");
                 }}
                 placeholder="1. I'm grateful for..."
-                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[16px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
               />
               <input
                 type="text"
@@ -136,7 +136,7 @@ export default function GratitudePage() {
                   setError("");
                 }}
                 placeholder="2. I'm grateful for..."
-                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[16px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
               />
               <input
                 type="text"
@@ -146,25 +146,25 @@ export default function GratitudePage() {
                   setError("");
                 }}
                 placeholder="3. I'm grateful for..."
-                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[14px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[16px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
               />
             </div>
 
             {error && (
-              <p className="text-serene-amber text-xs mt-3 font-sans font-medium">
+              <p className="text-serene-amber text-sm mt-3 font-sans font-medium">
                 {error}
               </p>
             )}
 
             {success && (
-              <p className="text-[#4A7C59] text-xs mt-3 font-sans font-medium">
+              <p className="text-[#4A7C59] text-sm mt-3 font-sans font-medium">
                 Saved! 🌿
               </p>
             )}
 
             <button
               onClick={handleSave}
-              className="bg-serene-green text-white text-[14px] font-medium py-2.5 px-6 rounded-lg border-0 hover:bg-[#3d664a] transition-colors mt-5 cursor-pointer"
+              className="bg-serene-green text-white text-[16px] font-medium py-2.5 px-6 rounded-lg border-0 hover:bg-[#3d664a] transition-colors mt-5 cursor-pointer"
             >
               Save today's gratitude
             </button>
@@ -173,7 +173,7 @@ export default function GratitudePage() {
 
         {/* Column 2: Past entries list */}
         <div className="flex flex-col gap-6 animate-fade-in-up">
-          <h3 className="font-serif text-[16px] text-serene-text font-semibold">
+          <h3 className="font-serif text-[18px] text-serene-text font-semibold">
             Previous entries
           </h3>
 
@@ -185,7 +185,7 @@ export default function GratitudePage() {
             <div className="flex flex-col gap-4">
               {sortedEntries.map((entry, idx) => (
                 <Card key={idx} className="border-serene-border p-5">
-                  <span className="block text-[11px] font-bold text-serene-muted tracking-wider uppercase font-sans mb-3">
+                  <span className="block text-[12px] font-bold text-serene-muted tracking-wider uppercase font-sans mb-3">
                     {formatDate(entry.date)}
                   </span>
 
@@ -195,7 +195,7 @@ export default function GratitudePage() {
                       .map((item, itemIdx) => (
                         <li
                           key={itemIdx}
-                          className="text-serene-text text-[13px] leading-relaxed font-sans flex items-start gap-2"
+                          className="text-serene-text text-[15px] leading-relaxed font-sans flex items-start gap-2"
                         >
                           <span className="text-serene-amber">•</span>
                           <span>{item}</span>
