@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
 const { isConnected } = require("../config/db");
 const fileStore = require("../services/fileUserStore");
 const useFileStoreFlag = process.env.USE_FILE_DB === "true";
@@ -118,4 +119,74 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getMe };
+// @route   POST /api/auth/google
+// @desc    Google auth callback & sign JWT
+// @access  Public
+const googleLogin = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ message: "Credential token is required" });
+    }
+
+    // Verify token with Google's tokeninfo API
+    const response = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+    const payload = response.data;
+
+    if (!payload || !payload.email) {
+      return res.status(400).json({ message: "Invalid Google token payload" });
+    }
+
+    // Validate client ID if configured
+    const expectedClientId = process.env.GOOGLE_CLIENT_ID;
+    if (expectedClientId && payload.aud !== expectedClientId) {
+      return res.status(400).json({ message: "Client ID mismatch" });
+    }
+
+    const { email, name } = payload;
+    const useFile = useFileStoreFlag || !isConnected();
+
+    let user;
+    if (!useFile) {
+      // MongoDB lookup
+      user = await User.findOne({ email: email.toLowerCase() });
+      if (!user) {
+        // Register new user with random password
+        const randomPassword = Math.random().toString(36).slice(-10) + Date.now().toString();
+        const hashedPassword = await bcrypt.hash(randomPassword, 10);
+        user = await User.create({
+          name: name || email.split("@")[0],
+          email: email.toLowerCase(),
+          password: hashedPassword,
+        });
+      }
+      const token = generateToken(user._id);
+      return res.status(200).json({
+        token,
+        user: { id: user._id, name: user.name, email: user.email },
+      });
+    }
+
+    // File Store lookup
+    user = await fileStore.findByEmail(email);
+    if (!user) {
+      // Register new user in File Store with random password
+      const randomPassword = Math.random().toString(36).slice(-10) + Date.now().toString();
+      user = await fileStore.createUser({
+        name: name || email.split("@")[0],
+        email: email.toLowerCase(),
+        password: randomPassword,
+      });
+    }
+    const token = generateToken(user.id || user._id);
+    return res.status(200).json({
+      token,
+      user: { id: user.id || user._id, name: user.name, email: user.email },
+    });
+  } catch (error) {
+    console.error("Google Auth error:", error.message);
+    res.status(500).json({ message: "Google Authentication failed. Please try again." });
+  }
+};
+
+module.exports = { registerUser, loginUser, googleLogin, getMe };

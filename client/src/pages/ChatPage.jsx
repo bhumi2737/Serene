@@ -117,10 +117,11 @@ export default function ChatPage() {
                 className={`flex flex-col ${isUser ? "items-end" : "items-start"}`}
               >
                 <div
-                  className={`max-w-[75%] rounded-lg px-4 py-2.5 text-sm leading-relaxed ${isUser
-                      ? "bg-serene-primary text-white dark:bg-[#4A7C59] dark:text-white"
-                      : "bg-serene-surface border border-serene-border text-serene-text font-serif"
-                    }`}
+                  className={`max-w-[70%] px-5 py-3.5 text-[14.5px] leading-relaxed shadow-xs ${
+                    isUser
+                      ? "rounded-[20px_20px_4px_20px] bg-serene-primary text-white dark:text-[#1C1B1F] font-sans font-medium"
+                      : "rounded-[20px_20px_20px_4px] bg-serene-surface border border-serene-border/40 text-serene-text font-serif"
+                  }`}
                 >
                   {msg.content}
                 </div>
@@ -135,7 +136,7 @@ export default function ChatPage() {
                   Companion is active
                 </span>
                 <div className="flex items-center justify-center h-4 w-24 overflow-hidden relative">
-                  <svg className="w-full h-full text-serene-green dark:text-emerald-500" viewBox="0 0 100 24" fill="none">
+                  <svg className="w-full h-full text-serene-primary" viewBox="0 0 100 24" fill="none">
                     <path
                       className="animate-wave-flow-1"
                       d="M0 12 C 20 6, 40 18, 60 12 C 80 6, 100 18, 120 12 L 120 24 L 0 24 Z"
@@ -171,21 +172,21 @@ export default function ChatPage() {
         )}
 
         {/* ── FOOTER INPUT FORM ── */}
-        <div className="flex items-center gap-2 pt-3 border-t border-serene-border">
+        <div className="flex items-center gap-3 pt-4 border-t border-serene-border/40">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Talk about how you feel..."
             rows={1}
-            className="flex-1 bg-serene-surface border border-serene-border rounded-lg px-4 py-3 text-sm text-serene-text placeholder-serene-muted focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none"
+            className="flex-1 bg-serene-surface/50 border border-serene-border/60 rounded-[24px] px-5 py-3.5 text-sm text-serene-text placeholder-serene-muted focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none shadow-xs transition-all duration-300"
           />
           <Button
             variant="primary"
             onClick={handleSend}
             disabled={!input.trim()}
             icon={Send}
-            className="h-11 w-11 !p-0 justify-center rounded-lg flex-shrink-0"
+            className="h-11 w-11 !p-0 justify-center rounded-full flex-shrink-0 hover:scale-105 transition-transform"
           />
         </div>
 

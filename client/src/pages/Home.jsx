@@ -20,6 +20,17 @@ const moodValueMap = {
   Amazing: 5,
 };
 
+const getMoodTheme = (label) => {
+  const map = {
+    Low: { bg: "bg-[#F3F4F6] text-[#4B5563] border-[#9CA3AF]", hover: "hover:border-[#9CA3AF]" },
+    Okay: { bg: "bg-[#E3D9C9]/35 text-[#7C2D12] border-[#E3D9C9]", hover: "hover:border-[#C8B195]" },
+    Good: { bg: "bg-[#D6C7FF]/40 text-[#4C1D95] border-[#D6C7FF]", hover: "hover:border-[#C4B5FD]" },
+    Great: { bg: "bg-[#FCDAB7]/45 text-[#9A3412] border-[#FCDAB7]", hover: "hover:border-[#FDBA74]" },
+    Amazing: { bg: "bg-serene-primarySoft text-serene-primary border-serene-primary/55", hover: "hover:border-serene-primary" },
+  };
+  return map[label] || { bg: "bg-serene-primarySoft text-serene-primary border-serene-primary/55", hover: "hover:border-serene-primary" };
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("Bhumi");
@@ -288,18 +299,19 @@ export default function Home() {
               <div className="grid grid-cols-5 gap-3">
                 {moodsList.map((mood, idx) => {
                   const isSelected = selectedMood === idx;
+                  const theme = getMoodTheme(mood.label);
                   return (
                     <div
                       key={mood.label}
                       onClick={() => handleMoodSelect(idx)}
-                      className={`flex flex-col items-center justify-center p-4 rounded-[12px] border cursor-pointer transition-all hover:scale-105 active:scale-95 duration-200 ${
+                      className={`flex flex-col items-center justify-center p-4 rounded-[16px] border cursor-pointer transition-all duration-300 hover:scale-103 active:scale-95 ${
                         isSelected
-                          ? "border-serene-green bg-serene-deep text-serene-text font-medium shadow-sm shadow-serene-green/10"
-                          : "border-serene-border bg-serene-bg text-serene-muted hover:border-serene-muted hover:bg-serene-surface"
+                          ? `${theme.bg} font-bold scale-[1.03] shadow-xs`
+                          : "border-serene-border/50 bg-serene-surface text-serene-muted hover:border-serene-muted hover:bg-serene-bg"
                       }`}
                     >
                       <span className="text-[32px] leading-none">{mood.emoji}</span>
-                      <span className="text-[12px] text-serene-muted mt-2 font-sans font-medium">
+                      <span className="text-[11px] text-serene-muted mt-2 font-sans font-semibold tracking-wide uppercase">
                         {mood.label}
                       </span>
                     </div>
@@ -341,7 +353,7 @@ export default function Home() {
                   <div className="text-center">
                     <button
                       onClick={handleStartBreathing}
-                      className="bg-serene-green text-white text-[15px] font-medium py-3 px-8 rounded-full border-0 hover:bg-[#3d664a] shadow-lg shadow-serene-green/10 transition-transform active:scale-95 cursor-pointer font-sans"
+                      className="bg-serene-primary text-white dark:text-[#1C1B1F] text-[15px] font-semibold py-3.5 px-8 rounded-full border-0 hover:opacity-90 shadow-md shadow-serene-primary/10 hover:scale-102 transition-all cursor-pointer font-sans"
                     >
                       Start Breathing Guide
                     </button>
@@ -357,7 +369,7 @@ export default function Home() {
                       <div className="absolute inset-0 rounded-full bg-serene-primarySoft/40 dark:bg-[#2A2830]/65 animate-breath z-0" />
                       
                       {/* Static center core */}
-                      <div className="w-20 h-20 rounded-full bg-serene-green text-white flex items-center justify-center text-[12px] font-bold z-10 shadow-md">
+                      <div className="w-20 h-20 rounded-full bg-serene-primary text-white dark:text-[#1C1B1F] flex items-center justify-center text-[12px] font-bold z-10 shadow-md">
                         {secondsLeft}s
                       </div>
                     </div>
@@ -693,7 +705,7 @@ export default function Home() {
               <button
                 onClick={handleWaterPlant}
                 disabled={isWatering || growthStage >= 4}
-                className="bg-serene-green text-white text-[12px] font-medium py-2 px-5 rounded-full border-0 hover:bg-[#3d664a] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all active:scale-95 w-full max-w-[150px]"
+                className="bg-serene-primary text-white dark:text-[#1C1B1F] text-[11px] font-bold tracking-wider uppercase py-2.5 px-5 rounded-full border-0 hover:opacity-90 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all active:scale-95 w-full max-w-[150px]"
               >
                 {isWatering ? "Watering..." : growthStage >= 4 ? "Fully Grown 🌸" : `Water (${waterCount % 3}/3)`}
               </button>

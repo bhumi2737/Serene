@@ -112,12 +112,12 @@ export default function GratitudePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         {/* Column 1: Today's check-in */}
         <div className="flex flex-col gap-4 animate-fade-in-up">
-          <Card className="border-serene-border p-7 bg-white dark:bg-[#25232A]">
-            <h2 className="font-serif text-[18px] text-serene-text font-semibold mb-4.5">
-              Today's highlights
+          <Card className="border-serene-border/50 p-8 bg-serene-surface/60 shadow-xs">
+            <h2 className="font-serif text-[19px] text-serene-text font-bold mb-5 flex items-center gap-2">
+              <span className="text-xl">🌸</span> Today's highlights
             </h2>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3.5">
               <input
                 type="text"
                 value={item1}
@@ -125,8 +125,8 @@ export default function GratitudePage() {
                   setItem1(e.target.value);
                   setError("");
                 }}
-                placeholder="1. I'm grateful for..."
-                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[16px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+                placeholder="1. Something that made you smile..."
+                className="w-full bg-serene-bg/50 border border-serene-border/70 rounded-[14px] p-[14px_18px] text-[15px] text-serene-text placeholder-serene-muted focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary transition-all duration-300"
               />
               <input
                 type="text"
@@ -135,8 +135,8 @@ export default function GratitudePage() {
                   setItem2(e.target.value);
                   setError("");
                 }}
-                placeholder="2. I'm grateful for..."
-                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[16px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+                placeholder="2. Someone you appreciate..."
+                className="w-full bg-serene-bg/50 border border-serene-border/70 rounded-[14px] p-[14px_18px] text-[15px] text-serene-text placeholder-serene-muted focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary transition-all duration-300"
               />
               <input
                 type="text"
@@ -145,29 +145,30 @@ export default function GratitudePage() {
                   setItem3(e.target.value);
                   setError("");
                 }}
-                placeholder="3. I'm grateful for..."
-                className="w-full bg-serene-bg border border-serene-border rounded-[10px] p-[12px_16px] text-[16px] text-serene-text placeholder-serene-muted focus:outline-none focus:border-serene-green"
+                placeholder="3. A small victory or positive event..."
+                className="w-full bg-serene-bg/50 border border-serene-border/70 rounded-[14px] p-[14px_18px] text-[15px] text-serene-text placeholder-serene-muted focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary transition-all duration-300"
               />
             </div>
 
             {error && (
-              <p className="text-serene-amber text-sm mt-3 font-sans font-medium">
+              <p className="text-serene-amber text-xs mt-3 font-sans font-semibold">
                 {error}
               </p>
             )}
 
             {success && (
-              <p className="text-[#4A7C59] text-sm mt-3 font-sans font-medium">
-                Saved! 🌿
+              <p className="text-serene-primary text-xs mt-3 font-sans font-semibold flex items-center gap-1">
+                Saved to your journal! 🌿
               </p>
             )}
 
-            <button
+            <Button
               onClick={handleSave}
-              className="bg-serene-green text-white text-[16px] font-medium py-2.5 px-6 rounded-lg border-0 hover:bg-[#3d664a] transition-colors mt-5 cursor-pointer"
+              variant="primary"
+              className="mt-6 w-full justify-center py-3 shadow-xs hover:scale-101 transition-transform"
             >
               Save today's gratitude
-            </button>
+            </Button>
           </Card>
         </div>
 
@@ -184,21 +185,24 @@ export default function GratitudePage() {
           ) : (
             <div className="flex flex-col gap-4">
               {sortedEntries.map((entry, idx) => (
-                <Card key={idx} className="border-serene-border p-5">
-                  <span className="block text-[12px] font-bold text-serene-muted tracking-wider uppercase font-sans mb-3">
-                    {formatDate(entry.date)}
-                  </span>
+                <Card key={idx} className="border-serene-border/40 p-6 bg-serene-surface/40 hover-lift hover-glow transition-all duration-300">
+                  <div className="flex items-center justify-between mb-3.5 border-b border-serene-border/20 pb-2">
+                    <span className="text-[11px] font-bold text-serene-primary tracking-wider uppercase font-sans">
+                      {formatDate(entry.date)}
+                    </span>
+                    <span className="text-xs">🌿</span>
+                  </div>
 
-                  <ul className="flex flex-col gap-2">
+                  <ul className="flex flex-col gap-2.5">
                     {entry.items
                       .filter((item) => item && item.trim() !== "")
                       .map((item, itemIdx) => (
                         <li
                           key={itemIdx}
-                          className="text-serene-text text-[15px] leading-relaxed font-sans flex items-start gap-2"
+                          className="text-serene-text text-[14px] leading-relaxed font-sans flex items-start gap-2.5"
                         >
-                          <span className="text-serene-amber">•</span>
-                          <span>{item}</span>
+                          <span className="text-serene-primary mt-1 text-[10px]">✦</span>
+                          <span className="font-medium text-serene-text">{item}</span>
                         </li>
                       ))}
                   </ul>

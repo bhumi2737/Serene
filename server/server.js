@@ -26,7 +26,7 @@ app.use(cors({
   credentials: true
 })); // Allows frontend (React) to talk to backend
 app.use(express.json()); // Allows backend to read JSON from requests
-app.use(mongoSanitize());
+// app.use(mongoSanitize());
 
 // Rate Limiters
 const generalLimiter = rateLimit({

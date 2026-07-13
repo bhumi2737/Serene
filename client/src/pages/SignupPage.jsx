@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import api from "../services/api";
 
 function FloorLamp({ isOn, onToggle }) {
   return (
@@ -103,6 +104,46 @@ function SignupPage() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [lampOn, setLampOn] = useState(true);
+
+  // Handle Google OAuth Callback
+  const handleGoogleSuccess = async (response) => {
+    try {
+      setLoading(true);
+      setError("");
+      const res = await api.googleLogin(response.credential);
+      localStorage.setItem("serene_token", res.token);
+      const nameVal = res.name || (res.user && res.user.name);
+      const emailVal = res.email || (res.user && res.user.email);
+      if (nameVal) localStorage.setItem("userName", nameVal);
+      if (emailVal) localStorage.setItem("userEmail", emailVal);
+      navigate("/home");
+    } catch (err) {
+      setError(err.message || "Google Sign-In failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    /* global google */
+    if (typeof google === "undefined") return;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID";
+    google.accounts.id.initialize({
+      client_id: clientId,
+      callback: handleGoogleSuccess,
+    });
+    
+    // Render the button only if the DOM element exists
+    const btnContainer = document.getElementById("google-signup-btn");
+    if (btnContainer) {
+      google.accounts.id.renderButton(btnContainer, {
+        theme: "outline",
+        size: "large",
+        shape: "pill",
+        width: btnContainer.offsetWidth || 340,
+      });
+    }
+  }, [loading]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -243,6 +284,17 @@ function SignupPage() {
             >
               {loading ? "Signing up..." : "Create account"}
             </Button>
+
+            {/* Separator */}
+            <div className="relative flex items-center justify-center my-4">
+              <div className="w-full border-t border-serene-border dark:border-[#3A3742]"></div>
+              <span className="absolute bg-serene-surface dark:bg-[#25232A] px-3 text-[11px] text-serene-muted uppercase tracking-wider">or</span>
+            </div>
+
+            {/* Google Sign In Button */}
+            <div className="flex justify-center w-full min-h-[44px]">
+              <div id="google-signup-btn" className="w-full flex justify-center"></div>
+            </div>
           </div>
 
           {error && (

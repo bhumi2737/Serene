@@ -38,4 +38,13 @@ export default {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
+
+  // POST /api/auth/google
+  googleLogin: async (credential) => {
+    return request('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential }),
+    });
+  },
 };

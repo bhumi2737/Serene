@@ -64,7 +64,7 @@ export default function JournalNewPage() {
   return (
     <AppShell>
       {/* ── HEADER & NAVIGATION ── */}
-      <div className="flex items-center justify-between mb-8 pb-4 border-b border-serene-border">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-serene-border/30">
         <Button
           variant="ghost"
           size="sm"
@@ -79,6 +79,7 @@ export default function JournalNewPage() {
             icon={Save}
             disabled={saving || analysing || saved}
             onClick={handleSave}
+            className="shadow-xs hover:scale-101 transition-transform"
           >
             {saving ? "Saving..." : (analysing ? "Analysing..." : (saved ? "Saved" : "Save Entry"))}
           </Button>
@@ -91,8 +92,8 @@ export default function JournalNewPage() {
       </div>
 
       <div className="max-w-2xl mx-auto">
-        <Card className="p-8">
-          <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider block mb-2">
+        <Card className="p-8 bg-serene-surface/50 border-serene-border/40 rounded-[24px]">
+          <span className="text-[11px] font-bold text-serene-primary uppercase tracking-widest block mb-3 font-sans">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               month: "long",
@@ -110,14 +111,14 @@ export default function JournalNewPage() {
                 if (e.target.value.trim()) setTitleError("");
               }}
               placeholder="Title of reflection"
-              className="w-full bg-transparent border-b border-serene-border dark:border-[#3A3742] py-3 text-xl font-semibold text-serene-primary dark:text-[#EDE8E0] placeholder-serene-muted dark:placeholder-[#A39C8F] focus:outline-none focus:border-serene-primary font-serif"
+              className="w-full bg-transparent border-b border-serene-border/50 py-3.5 text-2xl font-bold text-serene-primary placeholder-serene-muted focus:outline-none focus:border-serene-primary font-serif transition-colors"
             />
-            {titleError && <p className="text-serene-amber text-xs mt-1 font-sans">{titleError}</p>}
+            {titleError && <p className="text-serene-amber text-xs mt-1.5 font-sans font-semibold">{titleError}</p>}
           </div>
 
-          {/* Emotion Tag Selection (kept for layout preservation) */}
+          {/* Emotion Tag Selection */}
           <div className="mb-6">
-            <span className="text-xs font-semibold text-serene-muted uppercase tracking-wider block mb-3">
+            <span className="text-[11px] font-bold text-serene-muted uppercase tracking-wider block mb-3 font-sans">
               How does this reflect your emotional state?
             </span>
             <div className="flex flex-wrap gap-2">
@@ -128,10 +129,10 @@ export default function JournalNewPage() {
                     key={emo}
                     type="button"
                     onClick={() => setEmotion(emo)}
-                    className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                    className={`text-xs px-3.5 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
                       isActive
-                        ? "bg-serene-primarySoft dark:bg-[#2A2830] border-serene-primary dark:border-[#3A3742] text-serene-primary dark:text-[#EDE8E0] font-semibold"
-                        : "bg-serene-bg dark:bg-[#1C1B1F] border-serene-border dark:border-[#3A3742] text-serene-text dark:text-[#EDE8E0] hover:border-serene-muted"
+                        ? "bg-serene-primarySoft border-serene-primary text-serene-primary font-bold shadow-xs"
+                        : "bg-transparent border-serene-border/60 text-serene-muted hover:border-serene-muted"
                     }`}
                   >
                     {emo}
@@ -151,9 +152,9 @@ export default function JournalNewPage() {
               }}
               placeholder="Start writing freely..."
               rows={12}
-              className="w-full bg-serene-bg dark:bg-[#1C1B1F] border border-serene-border dark:border-[#3A3742] rounded-lg p-4 text-sm text-serene-text dark:text-[#EDE8E0] leading-relaxed font-serif focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none"
+              className="w-full bg-serene-bg/30 border border-serene-border/60 rounded-[14px] p-4 text-[15px] text-serene-text leading-relaxed font-serif focus:outline-none focus:ring-1 focus:ring-serene-primary focus:border-serene-primary resize-none shadow-inner transition-all duration-300"
             />
-            {bodyError && <p className="text-serene-amber text-xs mt-1 font-sans">{bodyError}</p>}
+            {bodyError && <p className="text-serene-amber text-xs mt-1.5 font-sans font-semibold">{bodyError}</p>}
           </div>
         </Card>
       </div>

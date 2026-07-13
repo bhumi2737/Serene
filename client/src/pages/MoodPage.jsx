@@ -8,11 +8,11 @@ import { getTheme } from "../utils/theme";
 import { getMoods, saveMood } from "../utils/api";
 
 const moodsList = [
-  { emoji: "😔", label: "Low", value: 1, color: "#66736F" },
-  { emoji: "😐", label: "Okay", value: 2, color: "#A9C7E8" },
-  { emoji: "😊", label: "Good", value: 3, color: "#DCEBE4" },
-  { emoji: "😄", label: "Great", value: 4, color: "#E78B78" },
-  { emoji: "🤩", label: "Amazing", value: 5, color: "#23443B" },
+  { emoji: "😔", label: "Low", value: 1 },
+  { emoji: "😐", label: "Okay", value: 2 },
+  { emoji: "😊", label: "Good", value: 3 },
+  { emoji: "😄", label: "Great", value: 4 },
+  { emoji: "🤩", label: "Amazing", value: 5 },
 ];
 
 const moodValueMap = {
@@ -21,6 +21,17 @@ const moodValueMap = {
   Good: 3,
   Great: 4,
   Amazing: 5,
+};
+
+const getMoodTheme = (label) => {
+  const map = {
+    Low: { bg: "bg-[#F3F4F6] text-[#4B5563] border-[#9CA3AF]", hover: "hover:border-[#9CA3AF]" },
+    Okay: { bg: "bg-[#E3D9C9]/35 text-[#7C2D12] border-[#E3D9C9]", hover: "hover:border-[#C8B195]" },
+    Good: { bg: "bg-[#D6C7FF]/40 text-[#4C1D95] border-[#D6C7FF]", hover: "hover:border-[#C4B5FD]" },
+    Great: { bg: "bg-[#FCDAB7]/45 text-[#9A3412] border-[#FCDAB7]", hover: "hover:border-[#FDBA74]" },
+    Amazing: { bg: "bg-serene-primarySoft text-serene-primary border-serene-primary/55", hover: "hover:border-serene-primary" },
+  };
+  return map[label] || { bg: "bg-serene-primarySoft text-serene-primary border-serene-primary/55", hover: "hover:border-serene-primary" };
 };
 
 export default function MoodPage() {
@@ -166,21 +177,22 @@ export default function MoodPage() {
             )}
 
             {/* Mood selector buttons */}
-            <div className="grid grid-cols-5 gap-2 mb-6">
+            <div className="grid grid-cols-5 gap-3 mb-6">
               {moodsList.map((mood) => {
                 const isSelected = selectedMood === mood.label;
+                const theme = getMoodTheme(mood.label);
                 return (
                   <button
                     key={mood.label}
                     onClick={() => handleMoodClick(mood.label)}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
+                    className={`flex flex-col items-center justify-center p-4 rounded-[20px] border shadow-xs transition-all duration-300 hover:scale-102 cursor-pointer ${
                       isSelected
-                        ? "border-serene-primary bg-serene-primarySoft text-serene-primary font-semibold"
-                        : "border-serene-border bg-serene-surface text-serene-text hover:border-serene-muted"
+                        ? `${theme.bg} font-bold scale-[1.03]`
+                        : `border-serene-border/50 bg-serene-surface text-serene-text ${theme.hover}`
                     }`}
                   >
-                    <span className="text-2xl mb-1">{mood.emoji}</span>
-                    <span className="text-[10px] tracking-wide font-medium">{mood.label}</span>
+                    <span className="text-3xl mb-2">{mood.emoji}</span>
+                    <span className="text-[11px] tracking-wider uppercase font-semibold">{mood.label}</span>
                   </button>
                 );
               })}
@@ -235,31 +247,60 @@ export default function MoodPage() {
             </div>
 
             <div className="h-44 w-full flex flex-col justify-end">
-              <svg width="100%" height="100" viewBox="0 0 700 100" preserveAspectRatio="none" className="overflow-visible">
+              <svg width="100%" height="90" viewBox="0 0 700 90" preserveAspectRatio="none" className="overflow-visible">
                 {weekDays.map((day, idx) => {
                   const entry = moods.find((m) => m.date === day.dateStr);
                   const val = entry ? moodValueMap[entry.mood] || 0 : 0;
-                  const barHeight = val * 20; // scaled to a max height of 100px (5 * 20)
-                  const y = 100 - barHeight;
+                  const barHeight = val * 18; // scaled to a max height of 90px (5 * 18)
+                  const y = 90 - barHeight;
                   const x = 35 + idx * 95; // 7 bars distributed
                   
-                  let fill = isDark ? "#25232A" : "#EDE8DC";
-                  if (day.isToday) {
-                    fill = "#4A7C59";
-                  } else if (entry) {
-                    fill = isDark ? "#3A3742" : "#D4CDB8";
-                  }
+                  const moodColorMap = {
+                    Low: "#9CA3AF",
+                    Okay: "#C8B195",
+                    Good: "#A78BFA",
+                    Great: "#FB923C",
+                    Amazing: "#4D7C59",
+                  };
+                  const barFill = entry ? moodColorMap[entry.mood] || "#4D7C59" : "transparent";
 
                   return (
-                    <rect
-                      key={day.name}
-                      x={x}
-                      y={y}
-                      width="35"
-                      height={barHeight}
-                      rx="4"
-                      fill={fill}
-                    />
+                    <g key={day.name}>
+                      {/* Empty track */}
+                      <rect
+                        x={x}
+                        y={0}
+                        width="30"
+                        height={90}
+                        rx="15"
+                        fill="#FAF9F6"
+                        stroke="#E2E8F0"
+                        strokeWidth="1.5"
+                        strokeDasharray={entry ? "none" : "2,2"}
+                        className="opacity-70"
+                      />
+                      {/* Active bar */}
+                      {val > 0 && (
+                        <rect
+                          x={x}
+                          y={y}
+                          width="30"
+                          height={barHeight}
+                          rx="15"
+                          fill={barFill}
+                          className="transition-all duration-300 hover:opacity-85"
+                        />
+                      )}
+                      {/* Today dot indicator */}
+                      {day.isToday && (
+                        <circle
+                          cx={x + 15}
+                          cy={val > 0 ? y + 5 : 82}
+                          r="3.5"
+                          fill="#1E293B"
+                        />
+                      )}
+                    </g>
                   );
                 })}
               </svg>

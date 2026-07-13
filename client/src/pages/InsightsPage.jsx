@@ -4,6 +4,7 @@ import AppShell from "../components/AppShell";
 import Card from "../components/Card";
 import StatItem from "../components/StatItem";
 import PageHeader from "../components/PageHeader";
+import Button from "../components/Button";
 import { getTheme } from "../utils/theme";
 import { getMoods, getJournals, getGratitude } from "../utils/api";
 
@@ -211,35 +212,28 @@ export default function InsightsPage() {
   const currentStreak = useMemo(() => calculateStreak(moods), [moods]);
   const longestStreak = useMemo(() => calculateLongestStreak(moods), [moods]);
 
-  const activeStyle = {
-    border: "1px solid #D4CDB8",
-    borderRadius: "8px",
-    padding: "8px 16px",
-    fontSize: "13px",
-    cursor: "pointer",
-    backgroundColor: "#D4CDB8",
-    color: "#2C2416",
-  };
+  // Style definitions removed - now using clean Tailwind classes instead
 
-  const inactiveStyle = {
-    border: "1px solid #D4CDB8",
-    borderRadius: "8px",
-    padding: "8px 16px",
-    fontSize: "13px",
-    cursor: "pointer",
-    backgroundColor: "transparent",
-    color: "#8C7E6A",
-  };
+  const chartPoints = useMemo(() => {
+    return moodSeries
+      .map((item, i) => {
+        const x = i * 18 + 30; // 30px left padding
+        const val = item.moodValue;
+        if (val === 0) return null;
+        const y = 110 - (val / 5) * 85; // 85px max chart height
+        return { x, y, ...item };
+      })
+      .filter(Boolean);
+  }, [moodSeries]);
 
-  const downloadButtonStyle = {
-    backgroundColor: "#2C2416",
-    color: "white",
-    borderRadius: "8px",
-    padding: "10px 24px",
-    fontSize: "14px",
-    cursor: isGenerating ? "not-allowed" : "pointer",
-    border: "none",
-  };
+  const chartPathD = useMemo(() => {
+    return chartPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  }, [chartPoints]);
+
+  const chartAreaD = useMemo(() => {
+    if (chartPoints.length === 0) return "";
+    return `${chartPathD} L ${chartPoints[chartPoints.length - 1].x} 110 L ${chartPoints[0].x} 110 Z`;
+  }, [chartPoints, chartPathD]);
 
   const handleDownload = async () => {
     setIsGenerating(true);
@@ -348,52 +342,66 @@ export default function InsightsPage() {
 
             <div className="h-64 w-full flex items-center justify-center">
               <svg viewBox="0 0 600 140" className="w-full h-full text-serene-muted select-none">
-                {/* Horizontal grid lines for Y-axis markers */}
-                <line x1="0" y1="10" x2="600" y2="10" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="30" x2="600" y2="30" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="50" x2="600" y2="50" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="70" x2="600" y2="70" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="90" x2="600" y2="90" stroke={inactiveColor} strokeDasharray="3 3" opacity="0.3" />
-                <line x1="0" y1="110" x2="600" y2="110" stroke={inactiveColor} strokeWidth="1" />
+                <defs>
+                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4D7C59" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#4D7C59" stopOpacity="0.00" />
+                  </linearGradient>
+                </defs>
 
+                {/* Horizontal grid lines for Y-axis markers */}
+                <line x1="20" y1="25" x2="580" y2="25" stroke="#E2E8F0" strokeDasharray="3 3" opacity="0.5" />
+                <line x1="20" y1="53" x2="580" y2="53" stroke="#E2E8F0" strokeDasharray="3 3" opacity="0.5" />
+                <line x1="20" y1="81" x2="580" y2="81" stroke="#E2E8F0" strokeDasharray="3 3" opacity="0.5" />
+                <line x1="20" y1="110" x2="580" y2="110" stroke="#CBD5E1" strokeWidth="1.2" />
+
+                {/* Area under the line */}
+                {chartPoints.length > 1 && (
+                  <path d={chartAreaD} fill="url(#chartGradient)" />
+                )}
+
+                {/* Main Trend Line */}
+                {chartPoints.length > 1 && (
+                  <path
+                    d={chartPathD}
+                    fill="none"
+                    stroke="#4D7C59"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                )}
+
+                {/* Chart Coordinate Dots */}
+                {chartPoints.map((p) => (
+                  <g key={p.date} className="group cursor-pointer">
+                    <circle cx={p.x} cy={p.y} r="4" fill="#FFFDF9" stroke="#4D7C59" strokeWidth="2" />
+                    <circle cx={p.x} cy={p.y} r="8" fill="#4D7C59" className="opacity-0 group-hover:opacity-15 transition-opacity duration-200" />
+                  </g>
+                ))}
+
+                {/* Date Labels below X-axis */}
                 {moodSeries.map((item, i) => {
-                  const x = i * 20 + 3;
-                  const isRecent = i >= 23;
-                  const height = item.moodValue === 0 ? 2 : (item.moodValue / 5) * 100;
-                  const y = 110 - height;
-                  const fill = item.moodValue === 0 ? inactiveColor : (isRecent ? "#4A7C59" : inactiveColor);
+                  const x = i * 18 + 30;
                   const showLabel = i % 5 === 0;
-                  
-                  let labelText = "";
-                  if (showLabel) {
-                    const parts = item.date.split("-");
-                    const d = new Date(parts[0], parts[1] - 1, parts[2]);
-                    labelText = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                  }
+                  if (!showLabel) return null;
+
+                  const parts = item.date.split("-");
+                  const d = new Date(parts[0], parts[1] - 1, parts[2]);
+                  const labelText = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
                   return (
-                    <g key={item.date}>
-                      <rect
-                        x={x}
-                        y={y}
-                        width={14}
-                        height={height}
-                        fill={fill}
-                        rx={item.moodValue === 0 ? 0 : 2}
-                      />
-                      {showLabel && (
-                        <text
-                          x={x + 7}
-                          y={125}
-                          textAnchor="middle"
-                          fontSize="9"
-                          fill="#8C7E6A"
-                          className="font-sans"
-                        >
-                          {labelText}
-                        </text>
-                      )}
-                    </g>
+                    <text
+                      key={item.date}
+                      x={x}
+                      y={126}
+                      textAnchor="middle"
+                      fontSize="9.5"
+                      fill="#64748B"
+                      className="font-sans font-medium"
+                    >
+                      {labelText}
+                    </text>
                   );
                 })}
               </svg>
@@ -420,11 +428,23 @@ export default function InsightsPage() {
                       <span>{item.label}</span>
                     </div>
                     {/* Progress track */}
-                    <div className="flex-1 h-2 bg-[#F5F0E8] rounded-full overflow-hidden border border-serene-border">
-                      <div
-                        className="h-full bg-[#4A7C59] rounded-full transition-all duration-500"
-                        style={{ width: `${item.percentage}%` }}
-                      />
+                    <div className="flex-1 h-2 bg-serene-bg rounded-full overflow-hidden border border-serene-border/60">
+                      {(() => {
+                        const moodColorMap = {
+                          Low: "#9CA3AF",
+                          Okay: "#C8B195",
+                          Good: "#A78BFA",
+                          Great: "#FB923C",
+                          Amazing: "#4D7C59",
+                        };
+                        const barFill = moodColorMap[item.key] || "#4D7C59";
+                        return (
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{ width: `${item.percentage}%`, backgroundColor: barFill }}
+                          />
+                        );
+                      })()}
                     </div>
                     <div className="w-24 text-right text-xs text-serene-muted font-medium">
                       {item.count} {item.count === 1 ? "entry" : "entries"}
@@ -585,39 +605,48 @@ export default function InsightsPage() {
       </Card>
 
       {/* ── DOWNLOAD WELLNESS REPORT CARD ── */}
-      <Card className="border-serene-border mb-8">
+      <Card className="border-serene-border/50 mb-8 p-7 bg-serene-surface/50">
         <div className="mb-4">
           <h3 className="text-base font-bold text-serene-primary font-serif">Download Wellness Report</h3>
           <p className="text-[13px] text-serene-muted mt-0.5">
-            Get a summary of your mood, journal, and gratitude data.
+            Get a structured summary of your logged mood patterns, journal reflections, and gratitude lists.
           </p>
         </div>
 
-        <div className="flex gap-[12px] mb-4">
+        <div className="flex gap-3 mb-5">
           <button
             onClick={() => setReportRange("weekly")}
-            style={reportRange === "weekly" ? activeStyle : inactiveStyle}
+            className={`px-4 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors duration-200 ${
+              reportRange === "weekly"
+                ? "bg-serene-primary text-white dark:text-[#1C1B1F] shadow-xs border border-serene-primary"
+                : "border border-serene-border/60 text-serene-muted hover:bg-serene-primarySoft hover:text-serene-primary bg-transparent"
+            }`}
           >
             Weekly
           </button>
           <button
             onClick={() => setReportRange("monthly")}
-            style={reportRange === "monthly" ? activeStyle : inactiveStyle}
+            className={`px-4 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-colors duration-200 ${
+              reportRange === "monthly"
+                ? "bg-serene-primary text-white dark:text-[#1C1B1F] shadow-xs border border-serene-primary"
+                : "border border-serene-border/60 text-serene-muted hover:bg-serene-primarySoft hover:text-serene-primary bg-transparent"
+            }`}
           >
             Monthly
           </button>
         </div>
 
-        <button
+        <Button
           onClick={handleDownload}
           disabled={isGenerating}
-          style={downloadButtonStyle}
+          variant="primary"
+          className="shadow-xs hover:scale-101 transition-transform"
         >
-          {isGenerating ? "Generating..." : "Download PDF Report"}
-        </button>
+          {isGenerating ? "Generating report..." : "Download PDF Report"}
+        </Button>
 
         {reportError && (
-          <p style={{ color: "#C17F24", fontSize: "13px", marginTop: "8px" }}>
+          <p className="text-serene-amber text-xs mt-3 font-sans font-semibold">
             {reportError}
           </p>
         )}

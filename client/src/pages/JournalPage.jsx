@@ -118,54 +118,47 @@ export default function JournalPage() {
           <p className="text-[13px] text-serene-muted mt-1 max-w-xs">
             Start writing your first reflection.
           </p>
-          <button
+          <Button
             onClick={() => navigate("/journal/new")}
-            className="bg-serene-primary dark:bg-[#4A7C59] text-white text-xs font-semibold px-5 py-2.5 rounded-lg mt-6 hover:bg-opacity-90 transition-all font-sans"
+            variant="primary"
+            className="mt-6 shadow-xs"
           >
             Write your first entry
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           {journals.map((entry) => (
-            <Card key={entry._id} className="hover:border-serene-primarySoft transition-colors flex flex-col justify-between p-6">
+            <Card key={entry._id} className="border-serene-border/40 hover-lift hover-glow transition-all duration-300 flex flex-col justify-between p-6 rounded-[20px] bg-serene-surface/50">
               <div>
-                <div className="flex items-center justify-between gap-4 mb-2">
-                  <h3 className="text-base font-bold text-serene-primary font-serif">
+                <div className="flex items-center justify-between gap-4 mb-3 pb-2 border-b border-serene-border/10">
+                  <h3 className="text-base font-bold text-serene-primary font-serif leading-snug">
                     {entry.title}
                   </h3>
                   <button
                     onClick={() => handleDelete(entry._id)}
-                    className="text-serene-amber hover:text-opacity-80 text-xs font-semibold cursor-pointer"
+                    className="text-red-500 hover:text-red-700 hover:underline text-[12px] font-semibold cursor-pointer transition-colors"
                   >
                     Delete
                   </button>
                 </div>
-                <p className="text-sm text-serene-text leading-relaxed font-serif mb-4 whitespace-pre-line">
+                <p className="text-[14px] text-serene-text leading-relaxed font-serif mb-4 whitespace-pre-line">
                   {getBodyPreview(entry.body)}
                 </p>
                 {entry.emotions && entry.emotions.length > 0 && (
                   <div className="mb-4">
                     {/* Emotion tags row */}
-                    <div className="flex flex-wrap items-center gap-y-1 mb-2">
+                    <div className="flex flex-wrap items-center gap-y-1 gap-x-1.5 mb-2">
                       {entry.emotions.slice(0, 3).map((emo, idx) => (
                         <span
                           key={idx}
-                          style={{
-                            backgroundColor: "rgba(74, 124, 89, 0.12)",
-                            color: "#4A7C59",
-                            borderRadius: "6px",
-                            padding: "2px 8px",
-                            fontSize: "11px",
-                            marginRight: "4px",
-                          }}
-                          className="inline-block"
+                          className="inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-serene-primarySoft/60 text-serene-primary border border-serene-primary/10 rounded-[6px]"
                         >
                           {emo}
                         </span>
                       ))}
                       {entry.emotions.length > 3 && (
-                        <span className="text-serene-muted text-[11px]">
+                        <span className="text-serene-muted text-[10px] font-semibold uppercase tracking-wider">
                           +{entry.emotions.length - 3} more
                         </span>
                       )}
@@ -173,8 +166,7 @@ export default function JournalPage() {
                     {/* Summary line */}
                     {entry.summary && (
                       <p
-                        className="text-serene-muted italic truncate"
-                        style={{ fontSize: "12px" }}
+                        className="text-serene-muted italic truncate text-[12px] border-l-2 border-serene-border/60 pl-2 mt-2"
                         title={entry.summary}
                       >
                         {entry.summary}
@@ -185,7 +177,7 @@ export default function JournalPage() {
               </div>
 
               {/* Date details */}
-              <div className="flex items-center gap-2 pt-3 border-t border-serene-border text-xs text-serene-muted mt-auto">
+              <div className="flex items-center gap-2 pt-3 border-t border-serene-border/30 text-[11px] text-serene-muted mt-auto">
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{formatDate(entry.date)}</span>
               </div>
