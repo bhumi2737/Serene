@@ -68,13 +68,13 @@ function LandingPage() {
   ];
 
   return (
-    <div className="h-screen overflow-y-auto flex flex-col bg-serene-bg text-serene-text font-sans scroll-smooth">
-      {/* ── CLEAN WHITE NAVIGATION ── */}
-      <header className="bg-serene-surface/80 dark:bg-[#1C1B1F]/80 backdrop-blur-md border-b border-serene-border/40 dark:border-[#3A3742] sticky top-0 z-50 transition-all duration-300">
+    <div className="h-screen overflow-y-auto flex flex-col bg-serene-gradient text-serene-text font-sans scroll-smooth">
+      {/* ── CLEAN NAVIGATION WITH BLUR ── */}
+      <header className="bg-[#FAF9F6]/85 backdrop-blur-md border-b border-serene-border/40 sticky top-0 z-50 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <span onClick={() => navigate("/")} className="text-lg font-bold text-serene-primary flex items-center gap-2 cursor-pointer">
-              🌿 <span className="font-serif text-serene-text dark:text-white">Serene</span>
+            <span onClick={() => navigate("/")} className="text-lg font-bold text-serene-primary flex items-center gap-2 cursor-pointer transition-transform hover:scale-102">
+              🌿 <span className="font-serif text-serene-text">Serene</span>
             </span>
             <nav className="hidden md:flex items-center gap-6">
               <a
@@ -83,7 +83,7 @@ function LandingPage() {
                   e.preventDefault();
                   navigate("/resources");
                 }}
-                className="text-sm text-serene-muted hover:text-[#4A7C59] font-medium transition-colors"
+                className="text-sm text-serene-muted hover:text-serene-primary font-semibold transition-colors"
               >
                 Resources
               </a>
@@ -93,7 +93,7 @@ function LandingPage() {
                   e.preventDefault();
                   navigate("/safety");
                 }}
-                className="text-sm text-serene-muted hover:text-[#4A7C59] font-medium transition-colors"
+                className="text-sm text-serene-muted hover:text-serene-primary font-semibold transition-colors"
               >
                 Safety
               </a>
@@ -123,29 +123,42 @@ function LandingPage() {
       </header>
 
       {/* ── HERO SECTION ── */}
-      <section className="relative w-full h-[580px] bg-[#17221F] overflow-hidden flex items-center">
-        {/* Photo Background */}
-        <img
-          src={botanicalHero}
-          alt="Chamomile and botanical leaves"
-          className="absolute inset-0 w-full h-full object-cover opacity-65 animate-fade-in"
-        />
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent" />
+      <section className="relative w-full min-h-[580px] py-16 md:py-24 overflow-hidden flex items-center bg-serene-gradient border-b border-serene-border/20">
+        {/* Soft Background botanical overlay */}
+        <div className="absolute inset-0 z-0 select-none pointer-events-none">
+          <img
+            src={botanicalHero}
+            alt=""
+            className="w-full h-full object-cover opacity-[0.06] mix-blend-multiply"
+          />
+        </div>
+        
+        {/* Whimsical celestial elements from Raft */}
+        <div className="absolute inset-0 pointer-events-none select-none z-0">
+          <span className="absolute top-[18%] left-[6%] text-xl text-serene-primary/30 animate-star-twinkle-1">✦</span>
+          <span className="absolute top-[22%] right-[10%] text-3xl text-[#D6C7FF]/60 animate-star-twinkle-2">✦</span>
+          <span className="absolute bottom-[20%] left-[12%] text-2xl text-[#FCDAB7]/70 animate-star-twinkle-3">✧</span>
+          <span className="absolute bottom-[28%] right-[18%] text-lg text-serene-primary/20 animate-star-twinkle-1">✧</span>
+        </div>
 
-        <div className="relative max-w-6xl w-full mx-auto px-6 z-10 text-white animate-fade-in-up">
-          <div className="max-w-xl">
-            <h1 className="text-5xl md:text-serene-textxl font-bold font-serif mb-4 leading-tight tracking-tight">
-              Serene
+        <div className="relative max-w-6xl w-full mx-auto px-6 z-10 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+          {/* Left Block */}
+          <div className="md:col-span-7 text-left animate-page-slide-up">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-serene-primarySoft text-serene-primary rounded-full text-xs font-semibold uppercase tracking-wider mb-6 border border-serene-primary/10">
+              🌿 Your Mental Wellness Companion
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-[54px] text-serene-text font-bold font-serif mb-6 leading-[1.1] tracking-tight">
+              Your Mental <br />
+              <span className="text-serene-primary">Health Matters.</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-200 mb-8 font-light leading-relaxed">
-              A quieter place to check in, write freely, and understand how you feel.
+            <p className="text-base md:text-lg text-serene-muted mb-8 font-light leading-relaxed max-w-lg">
+              A gentle, distraction-free space to check in daily, write private journals, track mood changes, and chat with a supportive AI companion.
             </p>
             <div className="flex flex-wrap gap-4">
               <Button
-                variant="secondary"
+                variant="primary"
                 size="lg"
-                className="hover:scale-105 transition-transform duration-300"
+                className="hover:scale-102 transition-transform duration-300 shadow-sm"
                 onClick={() => navigate(user ? "/home" : "/signup")}
               >
                 Start a check-in
@@ -154,7 +167,7 @@ function LandingPage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="bg-transparent text-white border-white hover:bg-white/10 hover:text-white hover:scale-105 transition-transform duration-300"
+                  className="hover:scale-102 transition-transform duration-300"
                   onClick={() => navigate("/login")}
                 >
                   Sign in
@@ -162,43 +175,58 @@ function LandingPage() {
               )}
             </div>
           </div>
+
+          {/* Right Block */}
+          <div className="md:col-span-5 flex justify-center items-center z-10 animate-fade-in">
+            <div className="relative p-4 bg-serene-surface/60 border border-serene-border/30 rounded-[32px] shadow-sm backdrop-blur-md max-w-sm w-full transition-all duration-500 hover:scale-[1.02] hover:shadow-md">
+              {/* Whimsical Sticker */}
+              <div className="absolute -top-5 -right-5 bg-serene-text text-serene-surface rounded-full w-20 h-20 flex items-center justify-center text-center p-2 text-[9px] font-semibold uppercase tracking-wider select-none shadow-md rotate-12 animate-float">
+                <span>We got you • check in</span>
+              </div>
+              <img
+                src={mindfulnessIllustration}
+                alt="Mindfulness Illustration"
+                className="w-full h-auto object-cover rounded-[24px]"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── ABOUT SERENE SECTION ── */}
-      <section className="py-24 bg-serene-bg border-b border-serene-border/40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          {/* Visual card */}
-          <div className="rounded-3xl overflow-hidden border border-serene-border/45 shadow-md bg-serene-surface/50 p-4 transition-all duration-300 hover:shadow-lg hover:scale-[1.01]">
+      <section className="py-24 bg-serene-surface/50 border-b border-serene-border/30 px-6 backdrop-blur-sm relative">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          {/* Visual card showing Dashboard Mockup instead of duplicated illustration */}
+          <div className="rounded-[32px] overflow-hidden border border-serene-border/30 shadow-sm bg-serene-surface p-4 transition-all duration-300 hover:shadow-md hover:scale-[1.01] animate-fade-in">
             <img
-              src={mindfulnessIllustration}
-              alt="Mindfulness Reflection illustration"
-              className="w-full h-auto object-cover rounded-2xl"
+              src={dashboardMockup}
+              alt="Serene App Interface"
+              className="w-full h-auto object-cover rounded-[24px]"
             />
           </div>
 
           {/* Text block */}
-          <div className="flex flex-col justify-center">
-            <span className="text-[#4A7C59] text-[12px] uppercase font-bold tracking-wider mb-2 inline-block">
-              🌿 ABOUT SERENE
+          <div className="flex flex-col justify-center animate-page-slide-up">
+            <span className="text-serene-primary text-xs uppercase font-bold tracking-wider mb-2 inline-block">
+              🌿 About Serene
             </span>
-            <h2 className="font-serif text-3xl md:text-serene-textxl text-serene-text font-bold tracking-tight mb-6 leading-tight">
+            <h2 className="font-serif text-3xl md:text-4xl text-serene-text font-bold tracking-tight mb-6 leading-tight">
               A quiet sanctuary for emotional self-awareness
             </h2>
-            <p className="text-serene-muted text-[14px] leading-relaxed mb-6">
+            <p className="text-serene-muted text-sm leading-relaxed mb-6 font-light">
               Serene is a self-guided digital workspace tailored to help you navigate how you feel. We believe emotional wellness shouldn't require complex dashboards or noisy feeds. By providing a clean, distraction-free environment, you can check in with yourself, record your thoughts, and notice patterns over time.
             </p>
             <ul className="space-y-3.5">
-              <li className="flex items-center gap-3 text-serene-text text-[13px] font-medium">
-                <span className="bg-[#4A7C59]/10 text-[#4A7C59] rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px]">✓</span>
+              <li className="flex items-center gap-3 text-serene-text text-sm font-medium">
+                <span className="bg-[#4D7C59]/10 text-serene-primary rounded-full w-5 h-5 flex items-center justify-center font-bold text-xs">✓</span>
                 <span>Fully private journal storage and encrypted data</span>
               </li>
-              <li className="flex items-center gap-3 text-serene-text text-[13px] font-medium">
-                <span className="bg-[#4A7C59]/10 text-[#4A7C59] rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px]">✓</span>
+              <li className="flex items-center gap-3 text-serene-text text-sm font-medium">
+                <span className="bg-[#4D7C59]/10 text-serene-primary rounded-full w-5 h-5 flex items-center justify-center font-bold text-xs">✓</span>
                 <span>Gentle AI support to highlight key triggers</span>
               </li>
-              <li className="flex items-center gap-3 text-serene-text text-[13px] font-medium">
-                <span className="bg-[#4A7C59]/10 text-[#4A7C59] rounded-full w-5 h-5 flex items-center justify-center font-bold text-[10px]">✓</span>
+              <li className="flex items-center gap-3 text-serene-text text-sm font-medium">
+                <span className="bg-[#4D7C59]/10 text-serene-primary rounded-full w-5 h-5 flex items-center justify-center font-bold text-xs">✓</span>
                 <span>No ads, no social metrics, and no notifications noise</span>
               </li>
             </ul>
@@ -207,47 +235,55 @@ function LandingPage() {
       </section>
 
       {/* ── FEATURES SECTION ── */}
-      <section id="features" className="py-24 bg-serene-primarySoft border-b border-serene-border/40 px-6">
-        <div className="max-w-6xl mx-auto">
+      <section id="features" className="py-24 bg-serene-primarySoft border-b border-serene-border/30 px-6 relative">
+        {/* Soft decorative background leaf silhouette overlay */}
+        <div className="absolute right-0 bottom-0 opacity-[0.05] pointer-events-none select-none z-0">
+          <span className="text-[120px] leading-none">🌿</span>
+        </div>
+        <div className="absolute left-0 top-0 opacity-[0.05] pointer-events-none select-none z-0">
+          <span className="text-[120px] leading-none">🍃</span>
+        </div>
+
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-serene-textxl font-bold text-serene-text font-serif mb-4 tracking-tight">
+            <h2 className="text-3xl md:text-4xl font-bold text-serene-text font-serif mb-4 tracking-tight">
               Quiet space for reflection
             </h2>
-            <p className="text-serene-muted text-sm">
+            <p className="text-serene-muted text-sm font-light">
               Simple, thoughtful elements to support your daily wellness journey.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 grid-cols-1 gap-8">
             {/* Card 1 */}
-            <div className="p-8 bg-white border border-serene-border/40 rounded-2xl shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-[#4A7C59]/40 flex flex-col justify-between">
+            <div className="p-8 bg-serene-surface border border-serene-border/30 rounded-[24px] shadow-sm hover-lift hover-glow flex flex-col justify-between">
               <div>
-                <div className="text-3xl mb-4">😊</div>
-                <h3 className="text-lg font-bold text-serene-text font-serif mb-2">Check in</h3>
-                <p className="text-[13px] text-serene-muted leading-relaxed">
-                  Log your current emotional state daily in seconds. Notice patterns over time without judgment.
+                <div className="w-12 h-12 rounded-full bg-[#FAF9F6] border border-serene-border/20 flex items-center justify-center text-2xl mb-6 shadow-sm">😊</div>
+                <h3 className="text-lg font-bold text-serene-text font-serif mb-3">Check in</h3>
+                <p className="text-sm text-serene-muted font-light leading-relaxed">
+                  Log your current emotional state daily in seconds. Notice patterns over time without judgment or pressure.
                 </p>
               </div>
             </div>
 
             {/* Card 2 */}
-            <div className="p-8 bg-white border border-serene-border/40 rounded-2xl shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-[#4A7C59]/40 flex flex-col justify-between">
+            <div className="p-8 bg-serene-surface border border-serene-border/30 rounded-[24px] shadow-sm hover-lift hover-glow flex flex-col justify-between">
               <div>
-                <div className="text-3xl mb-4">✍️</div>
-                <h3 className="text-lg font-bold text-serene-text font-serif mb-2">Reflect</h3>
-                <p className="text-[13px] text-serene-muted leading-relaxed">
-                  Record your daily thoughts in a calm, distraction-free digital journal. Prompt questions guide your voice.
+                <div className="w-12 h-12 rounded-full bg-[#FAF9F6] border border-serene-border/20 flex items-center justify-center text-2xl mb-6 shadow-sm">✍️</div>
+                <h3 className="text-lg font-bold text-serene-text font-serif mb-3">Reflect</h3>
+                <p className="text-sm text-serene-muted font-light leading-relaxed">
+                  Record your daily thoughts in a calm, distraction-free digital journal. Prompt questions help guide your voice.
                 </p>
               </div>
             </div>
 
             {/* Card 3 */}
-            <div className="p-8 bg-white border border-serene-border/40 rounded-2xl shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-[#4A7C59]/40 flex flex-col justify-between">
+            <div className="p-8 bg-serene-surface border border-serene-border/30 rounded-[24px] shadow-sm hover-lift hover-glow flex flex-col justify-between">
               <div>
-                <div className="text-3xl mb-4">📊</div>
-                <h3 className="text-lg font-bold text-serene-text font-serif mb-2">Notice patterns</h3>
-                <p className="text-[13px] text-serene-muted leading-relaxed">
-                  View trends across mood metrics and journal logs. Uncover insights to foster mindfulness.
+                <div className="w-12 h-12 rounded-full bg-[#FAF9F6] border border-serene-border/20 flex items-center justify-center text-2xl mb-6 shadow-sm">📊</div>
+                <h3 className="text-lg font-bold text-serene-text font-serif mb-3">Notice patterns</h3>
+                <p className="text-sm text-serene-muted font-light leading-relaxed">
+                  View trends across mood metrics and journal logs. Uncover deep insights to foster mindfulness and self-compassion.
                 </p>
               </div>
             </div>
@@ -256,43 +292,43 @@ function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS SECTION ── */}
-      <section className="py-24 bg-serene-bg border-b border-serene-border/40 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <section className="py-24 bg-serene-gradient border-b border-serene-border/20 px-6 relative">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
           {/* Step layout */}
-          <div>
-            <span className="text-[#4A7C59] text-[12px] uppercase font-bold tracking-wider mb-2 inline-block">
-              👣 STEP-BY-STEP
+          <div className="animate-page-slide-up">
+            <span className="text-serene-primary text-xs uppercase font-bold tracking-wider mb-2 inline-block">
+              👣 Step-by-Step
             </span>
-            <h2 className="font-serif text-3xl md:text-serene-textxl text-serene-text font-bold tracking-tight mb-8">
+            <h2 className="font-serif text-3xl md:text-4xl text-serene-text font-bold tracking-tight mb-8">
               A path toward emotional clarity
             </h2>
 
             <div className="space-y-8">
               <div className="flex gap-4">
-                <span className="text-[#4A7C59] font-serif font-bold text-xl bg-[#4A7C59]/10 rounded-full w-10 h-10 flex items-center justify-center shrink-0">1</span>
+                <span className="text-serene-primary font-serif font-bold text-lg bg-serene-primary/10 rounded-full w-10 h-10 flex items-center justify-center shrink-0 border border-serene-primary/20">1</span>
                 <div>
-                  <h3 className="font-bold text-[16px] text-serene-text font-serif">Daily Mood Check-ins</h3>
-                  <p className="text-serene-muted text-[13px] leading-relaxed mt-1">
+                  <h3 className="font-bold text-base text-serene-text font-serif">Daily Mood Check-ins</h3>
+                  <p className="text-serene-muted text-sm font-light leading-relaxed mt-1">
                     Begin each day by recording your emotional notes. Rate your energy, mood, and register your gratitude details.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <span className="text-[#4A7C59] font-serif font-bold text-xl bg-[#4A7C59]/10 rounded-full w-10 h-10 flex items-center justify-center shrink-0">2</span>
+                <span className="text-serene-primary font-serif font-bold text-lg bg-serene-primary/10 rounded-full w-10 h-10 flex items-center justify-center shrink-0 border border-serene-primary/20">2</span>
                 <div>
-                  <h3 className="font-bold text-[16px] text-serene-text font-serif">Write & Reflect</h3>
-                  <p className="text-serene-muted text-[13px] leading-relaxed mt-1">
+                  <h3 className="font-bold text-base text-serene-text font-serif">Write & Reflect</h3>
+                  <p className="text-serene-muted text-sm font-light leading-relaxed mt-1">
                     Use our clean digital text editor to write a journal entry. Let the companion analyze logs and organize triggers.
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-4">
-                <span className="text-[#4A7C59] font-serif font-bold text-xl bg-[#4A7C59]/10 rounded-full w-10 h-10 flex items-center justify-center shrink-0">3</span>
+                <span className="text-serene-primary font-serif font-bold text-lg bg-serene-primary/10 rounded-full w-10 h-10 flex items-center justify-center shrink-0 border border-serene-primary/20">3</span>
                 <div>
-                  <h3 className="font-bold text-[16px] text-serene-text font-serif">Acknowledge Insights</h3>
-                  <p className="text-serene-muted text-[13px] leading-relaxed mt-1">
+                  <h3 className="font-bold text-base text-serene-text font-serif">Acknowledge Insights</h3>
+                  <p className="text-serene-muted text-sm font-light leading-relaxed mt-1">
                     Unlock long-term patterns via data-driven charts. Keep your records safe and notice what brings you joy.
                   </p>
                 </div>
@@ -300,37 +336,47 @@ function LandingPage() {
             </div>
           </div>
 
-          {/* Mockup card */}
-          <div className="rounded-3xl overflow-hidden border border-serene-border/45 shadow-lg bg-white p-4 transition-all hover:scale-[1.02] duration-300">
-            <img
-              src={dashboardMockup}
-              alt="Serene App dashboard mockup calendar"
-              className="w-full h-auto rounded-2xl object-cover"
-            />
+          {/* Interactive Breathing circle visual container instead of duplicated mockup */}
+          <div className="flex justify-center items-center">
+            <div className="rounded-[32px] overflow-hidden border border-serene-border/30 shadow-sm bg-serene-surface/40 p-8 text-center backdrop-blur-md max-w-sm w-full">
+              <span className="text-serene-primary text-xs uppercase font-bold tracking-wider mb-4 inline-block">
+                🌬️ Breath Space
+              </span>
+              <p className="text-serene-muted text-xs font-light mb-8">
+                Take a deep breath. Sync your breathing with the expanding circle.
+              </p>
+              <div className="w-40 h-40 mx-auto rounded-full bg-serene-primary/10 border-2 border-serene-primary/30 flex items-center justify-center animate-breath mb-6">
+                <span className="text-serene-primary font-serif font-semibold text-sm">Calm</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── MINDFUL QUOTE ── */}
-      <section className="py-20 bg-serene-primarySoft text-center border-b border-serene-border/40 px-6">
-        <div className="max-w-3xl mx-auto">
+      <section className="py-24 bg-serene-primarySoft text-center border-b border-serene-border/30 px-6 relative overflow-hidden">
+        {/* Soft background glow circles */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-48 h-48 bg-[#D6C7FF]/15 blur-3xl rounded-full"></div>
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-48 h-48 bg-[#FCDAB7]/15 blur-3xl rounded-full"></div>
+
+        <div className="max-w-3xl mx-auto relative z-10">
           <span className="text-xl inline-block mb-3 select-none">🍃</span>
-          <blockquote className="font-serif text-serene-textxl md:text-3xl text-serene-text italic leading-relaxed mb-4">
+          <blockquote className="font-serif text-2xl md:text-3xl text-serene-text italic leading-relaxed mb-6">
             "The happiness of your life depends upon the quality of your thoughts."
           </blockquote>
-          <cite className="text-serene-muted text-[13px] uppercase font-bold tracking-wider not-italic">
+          <cite className="text-serene-muted text-xs uppercase font-bold tracking-wider not-italic">
             — Marcus Aurelius, Meditations
           </cite>
         </div>
       </section>
 
       {/* ── FAQ SECTION ── */}
-      <section className="py-20 bg-serene-bg px-6">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-serif text-[24px] text-serene-text font-bold text-center mb-10 tracking-tight">
+      <section className="py-24 bg-serene-gradient px-6 relative">
+        <div className="max-w-3xl mx-auto relative z-10">
+          <h2 className="font-serif text-2xl md:text-3xl text-serene-text font-bold text-center mb-10 tracking-tight">
             Frequently Asked Questions
           </h2>
-          <div className="bg-serene-surface/70 border border-serene-border/40 rounded-2xl p-6 shadow-sm">
+          <div className="bg-serene-surface/60 border border-serene-border/30 rounded-[24px] p-8 shadow-sm backdrop-blur-md">
             {faqs.map((faq, idx) => (
               <FAQItem
                 key={idx}
@@ -344,9 +390,12 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="bg-white dark:bg-[#1C1B1F]/90 py-12 text-sm border-t border-serene-border dark:border-[#3A3742] mt-auto">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+      {/* ── FOOTER WITH BOTANICAL GRASS INTERACTION ── */}
+      <footer className="bg-serene-surface/90 py-16 text-sm border-t border-serene-border/30 relative overflow-hidden">
+        {/* Grass elements at the bottom footer representing Ghibli Hills */}
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-serene-primary/10 to-transparent pointer-events-none opacity-40"></div>
+        
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
           <div className="text-serene-muted text-xs">
             © {new Date().getFullYear()} Serene. All wellness features are self-check templates.
           </div>
@@ -357,7 +406,7 @@ function LandingPage() {
                 e.preventDefault();
                 navigate("/safety");
               }}
-              className="hover:text-[#4A7C59] transition-colors"
+              className="hover:text-serene-primary font-medium transition-colors"
             >
               Safety
             </a>
@@ -367,12 +416,12 @@ function LandingPage() {
                 e.preventDefault();
                 navigate("/resources");
               }}
-              className="hover:text-[#4A7C59] transition-colors"
+              className="hover:text-serene-primary font-medium transition-colors"
             >
               Resources
             </a>
-            <a href="/privacy" onClick={(e) => { e.preventDefault(); alert("Demo Privacy Policy: Serene processes all data locally on your device."); }} className="hover:text-[#4A7C59] transition-colors">Privacy Policy</a>
-            <a href="/contact" onClick={(e) => { e.preventDefault(); alert("Contact: support@serene-demo.local"); }} className="hover:text-[#4A7C59] transition-colors">Contact</a>
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); alert("Demo Privacy Policy: Serene processes all data locally on your device."); }} className="hover:text-serene-primary font-medium transition-colors">Privacy Policy</a>
+            <a href="/contact" onClick={(e) => { e.preventDefault(); alert("Contact: support@serene-demo.local"); }} className="hover:text-serene-primary font-medium transition-colors">Contact</a>
           </div>
         </div>
       </footer>

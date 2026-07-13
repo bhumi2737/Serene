@@ -7,15 +7,21 @@ html {
 }
 
 :root {
-  --bg: #EADFC9;
-  --surface: #F8F3E6;
-  --primary: #5C4F3D;
-  --primary-soft: #E8DEC9;
-  --secondary: #C8B195;
-  --accent: #D4A373;
-  --text: #3E3529;
-  --muted: #8E7E6B;
-  --border: #D8CBB5;
+  --bg: #FAF9F6;
+  --surface: #FFFDF9;
+  --primary: #4D7C59;
+  --primary-soft: #F0F4F1;
+  --secondary: #E3D9C9;
+  --accent: #D6C7FF;
+  --text: #1E293B;
+  --muted: #57534E;
+  --border: #E5E5E0;
+}
+
+.bg-serene-gradient {
+  background: radial-gradient(circle at 10% 20%, rgba(214, 199, 255, 0.15) 0%, transparent 45%),
+              radial-gradient(circle at 90% 80%, rgba(252, 218, 183, 0.15) 0%, transparent 45%),
+              var(--bg);
 }
 
 .dark {

@@ -3,20 +3,30 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import Button from "../components/Button";
 
+const getCategoryStyles = (category) => {
+  const lower = category.toLowerCase();
+  if (lower.includes("anxiety")) return "bg-[#D6C7FF]/35 text-[#4C1D95]";
+  if (lower.includes("sleep")) return "bg-serene-primarySoft/90 text-serene-primary";
+  if (lower.includes("mindfulness")) return "bg-[#FCDAB7]/45 text-[#9A3412]";
+  if (lower.includes("students")) return "bg-[#FEF08A]/60 text-[#854D0E]";
+  if (lower.includes("therapy")) return "bg-serene-secondary/40 text-serene-text";
+  return "bg-serene-primarySoft/60 text-serene-primary";
+};
+
 function ArticleCard({ category, title, content }) {
   const [expanded, setExpanded] = useState(false);
-  const displayContent = expanded ? content : content.slice(0, 80) + "...";
+  const displayContent = expanded ? content : content.slice(0, 95) + "...";
 
   return (
-    <div className="bg-serene-surface/75 backdrop-blur-md border border-serene-border/45 rounded-2xl p-6 flex flex-col justify-between shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md hover:border-[#4A7C59]/40">
+    <div className="bg-serene-surface border border-serene-border/30 rounded-[24px] p-6 flex flex-col justify-between shadow-sm hover-lift hover-glow">
       <div>
-        <span className="bg-[#4A7C59]/10 text-[#4A7C59] font-medium tracking-wide uppercase text-[10px] rounded-full px-3 py-1 inline-block">
+        <span className={`${getCategoryStyles(category)} font-semibold tracking-wide uppercase text-[10px] rounded-full px-3 py-1 inline-block`}>
           {category}
         </span>
-        <h3 className="text-serene-text font-serif text-[16px] font-semibold mt-3 tracking-tight leading-snug">
+        <h3 className="text-serene-text font-serif text-[18px] font-bold mt-4 tracking-tight leading-snug">
           {title}
         </h3>
-        <p className="text-serene-muted text-[13px] leading-relaxed mt-2.5">
+        <p className="text-serene-muted text-[13px] leading-relaxed mt-3 font-light">
           {displayContent}
         </p>
       </div>
@@ -24,14 +34,14 @@ function ArticleCard({ category, title, content }) {
         {expanded ? (
           <button
             onClick={() => setExpanded(false)}
-            className="text-[#C17F24] hover:text-[#a0681c] text-[13px] font-semibold mt-4 inline-flex items-center gap-1 transition-colors hover:underline"
+            className="text-serene-primary hover:opacity-80 text-[13px] font-semibold mt-4 inline-flex items-center gap-1 transition-opacity"
           >
             Show less ↑
           </button>
         ) : (
           <button
             onClick={() => setExpanded(true)}
-            className="text-[#C17F24] hover:text-[#a0681c] text-[13px] font-semibold mt-4 inline-flex items-center gap-1 transition-colors hover:underline"
+            className="text-serene-primary hover:opacity-80 text-[13px] font-semibold mt-4 inline-flex items-center gap-1 transition-opacity"
           >
             Read more ↓
           </button>
@@ -93,13 +103,13 @@ function ResourcesPage() {
   ];
 
   return (
-    <div className="h-screen overflow-y-auto flex flex-col bg-serene-bg text-serene-text font-sans">
-      {/* ── CLEAN WHITE NAVIGATION ── */}
-      <header className="bg-serene-surface/80 dark:bg-[#1C1B1F]/80 backdrop-blur-md border-b border-serene-border/40 dark:border-[#3A3742] sticky top-0 z-50 transition-all duration-300">
+    <div className="h-screen overflow-y-auto flex flex-col bg-serene-gradient text-serene-text font-sans scroll-smooth">
+      {/* ── CLEAN NAVIGATION WITH BLUR ── */}
+      <header className="bg-[#FAF9F6]/85 backdrop-blur-md border-b border-serene-border/40 sticky top-0 z-50 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <span onClick={() => navigate("/")} className="text-lg font-bold text-serene-primary flex items-center gap-2 cursor-pointer">
-              🌿 <span className="font-serif text-serene-text dark:text-white">Serene</span>
+            <span onClick={() => navigate("/")} className="text-lg font-bold text-serene-primary flex items-center gap-2 cursor-pointer transition-transform hover:scale-102">
+              🌿 <span className="font-serif text-serene-text">Serene</span>
             </span>
             <nav className="hidden md:flex items-center gap-6">
               <a
@@ -108,7 +118,7 @@ function ResourcesPage() {
                   e.preventDefault();
                   navigate("/resources");
                 }}
-                className="text-sm text-serene-muted hover:text-[#4A7C59] font-medium transition-colors"
+                className="text-sm text-serene-muted hover:text-serene-primary font-semibold transition-colors"
               >
                 Resources
               </a>
@@ -118,7 +128,7 @@ function ResourcesPage() {
                   e.preventDefault();
                   navigate("/safety");
                 }}
-                className="text-sm text-serene-muted hover:text-[#4A7C59] font-medium transition-colors"
+                className="text-sm text-serene-muted hover:text-serene-primary font-semibold transition-colors"
               >
                 Safety
               </a>
@@ -148,23 +158,25 @@ function ResourcesPage() {
       </header>
 
       {/* ── PAGE HERO SECTION ── */}
-      <section className="bg-serene-bg pt-[60px] pb-[40px] text-center px-12 animate-fade-in">
-        <h1 className="font-serif text-[40px] text-serene-text font-bold tracking-tight">
-          Mental Health Resources
-        </h1>
-        <p className="text-serene-muted text-[16px] max-w-[520px] mx-auto mt-[12px] leading-relaxed">
-          You are not alone. Here are trusted resources and guidance to support your wellbeing.
-        </p>
+      <section className="bg-serene-gradient pt-16 pb-10 text-center px-12 animate-fade-in relative">
+        <div className="max-w-xl mx-auto relative z-10">
+          <h1 className="font-serif text-4xl md:text-5xl text-serene-text font-bold tracking-tight">
+            Mental Health Resources
+          </h1>
+          <p className="text-serene-muted text-base md:text-lg max-w-[520px] mx-auto mt-4 leading-relaxed font-light">
+            You are not alone. Here are trusted articles, self-care practices, and guidance to support your emotional wellbeing.
+          </p>
+        </div>
       </section>
 
       {/* ── SECTION 2: UNDERSTANDING MENTAL HEALTH ── */}
-      <section className="bg-serene-primarySoft py-12 px-6 md:px-12 border-t border-b border-serene-border">
+      <section className="bg-serene-surface/40 py-16 px-6 md:px-12 border-t border-b border-serene-border/30 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto animate-fade-in-up">
-          <h2 className="font-serif text-[22px] text-serene-text font-bold mb-[20px]">
+          <h2 className="font-serif text-2xl text-serene-text font-bold mb-8 tracking-tight">
             Understanding Mental Health
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-[16px] items-start">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             {articles.map((art, idx) => (
               <ArticleCard
                 key={idx}
@@ -178,134 +190,129 @@ function ResourcesPage() {
       </section>
 
       {/* ── SECTION 3: SELF-HELP TECHNIQUES ── */}
-      <section className="bg-serene-bg py-16 px-6 md:px-12 border-b border-serene-border">
+      <section className="bg-serene-gradient py-20 px-6 md:px-12 border-b border-serene-border/20 relative">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-serif text-[22px] text-serene-text font-bold mb-[24px] tracking-tight">
+          <h2 className="font-serif text-2xl md:text-3xl text-serene-text font-bold mb-8 tracking-tight">
             Quick Self-Help Techniques
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-[16px] items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             {/* Tech 1 */}
-            <div className="bg-serene-surface/80 backdrop-blur-sm border border-serene-border/45 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-              <span className="text-[28px]">🌬️</span>
-              <h3 className="text-serene-text font-serif text-[16px] font-semibold mt-3 tracking-tight">
+            <div className="bg-serene-surface border border-serene-border/30 rounded-[24px] p-6 shadow-sm hover-lift hover-glow">
+              <div className="w-12 h-12 rounded-full bg-[#FAF9F6] border border-serene-border/20 flex items-center justify-center text-2xl mb-4 shadow-xs">🌬️</div>
+              <h3 className="text-serene-text font-serif text-[18px] font-bold tracking-tight">
                 4-7-8 Breathing
               </h3>
-              <ul className="text-serene-muted text-[13px] leading-relaxed mt-4 space-y-2.5">
+              <ul className="text-serene-muted text-sm leading-relaxed mt-4 space-y-3 font-light">
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">1</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">1</span>
                   <span>Inhale quietly through your nose for 4 seconds.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">2</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">2</span>
                   <span>Hold your breath for 7 seconds.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">3</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">3</span>
                   <span>Exhale completely through your mouth for 8 seconds.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">4</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">4</span>
                   <span>Repeat 3–4 times.</span>
                 </li>
-                <li className="text-[12px] italic text-serene-muted pl-7 mt-1.5 leading-snug">
+                <li className="text-xs italic text-serene-muted pl-7 mt-2 leading-snug">
                   This activates your parasympathetic nervous system and reduces acute anxiety within minutes.
                 </li>
               </ul>
             </div>
 
             {/* Tech 2 */}
-            <div className="bg-serene-surface/80 backdrop-blur-sm border border-serene-border/45 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-              <span className="text-[28px]">🌱</span>
-              <h3 className="text-serene-text font-serif text-[16px] font-semibold mt-3 tracking-tight">
+            <div className="bg-serene-surface border border-serene-border/30 rounded-[24px] p-6 shadow-sm hover-lift hover-glow">
+              <div className="w-12 h-12 rounded-full bg-[#FAF9F6] border border-serene-border/20 flex items-center justify-center text-2xl mb-4 shadow-xs">🌱</div>
+              <h3 className="text-serene-text font-serif text-[18px] font-bold tracking-tight">
                 5-4-3-2-1 Grounding
               </h3>
-              <ul className="text-serene-muted text-[13px] leading-relaxed mt-4 space-y-2.5">
+              <ul className="text-serene-muted text-sm leading-relaxed mt-4 space-y-3 font-light">
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">1</span>
-                  <span>Name 5 things you can see.</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">1</span>
+                  <span>Name 5 things you can see around you.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">2</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">2</span>
                   <span>Name 4 things you can physically touch.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">3</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">3</span>
                   <span>Name 3 things you can hear.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">4</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">4</span>
                   <span>Name 2 things you can smell.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">5</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">5</span>
                   <span>Name 1 thing you can taste.</span>
                 </li>
-                <li className="text-[12px] italic text-serene-muted pl-7 mt-1.5 leading-snug">
-                  This technique interrupts anxious thoughts by anchoring you in the present moment.
+                <li className="text-xs italic text-serene-muted pl-7 mt-2 leading-snug">
+                  This technique interrupts anxious thoughts by anchoring you in the physical present.
                 </li>
               </ul>
             </div>
 
             {/* Tech 3 */}
-            <div className="bg-serene-surface/80 backdrop-blur-sm border border-serene-border/45 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-              <span className="text-[28px]">📓</span>
-              <h3 className="text-serene-text font-serif text-[16px] font-semibold mt-3 tracking-tight">
+            <div className="bg-serene-surface border border-serene-border/30 rounded-[24px] p-6 shadow-sm hover-lift hover-glow">
+              <div className="w-12 h-12 rounded-full bg-[#FAF9F6] border border-serene-border/20 flex items-center justify-center text-2xl mb-4 shadow-xs">📓</div>
+              <h3 className="text-serene-text font-serif text-[18px] font-bold tracking-tight">
                 Brain Dump Journalling
               </h3>
-              <ul className="text-serene-muted text-[13px] leading-relaxed mt-4 space-y-2.5">
+              <ul className="text-serene-muted text-sm leading-relaxed mt-4 space-y-3 font-light">
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">1</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">1</span>
                   <span>Set a timer for 5 minutes.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">2</span>
-                  <span>Write everything on your mind without filtering or editing.</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">2</span>
+                  <span>Write everything on your mind without filtering, spelling errors, or edits.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">3</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">3</span>
                   <span>Do not stop writing until the timer ends.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">4</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">4</span>
                   <span>Close the journal and take 3 deep breaths.</span>
                 </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">5</span>
-                  <span>Notice how much lighter you feel.</span>
+                <li className="text-xs italic text-serene-muted pl-7 mt-2 leading-snug">
+                  Pouring chaotic thoughts onto paper helps clarify and quiet the mind.
                 </li>
               </ul>
             </div>
 
             {/* Tech 4 */}
-            <div className="bg-serene-surface/80 backdrop-blur-sm border border-serene-border/45 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-              <span className="text-[28px]">🚶</span>
-              <h3 className="text-serene-text font-serif text-[16px] font-semibold mt-3 tracking-tight">
+            <div className="bg-serene-surface border border-serene-border/30 rounded-[24px] p-6 shadow-sm hover-lift hover-glow">
+              <div className="w-12 h-12 rounded-full bg-[#FAF9F6] border border-serene-border/20 flex items-center justify-center text-2xl mb-4 shadow-xs">🚶</div>
+              <h3 className="text-serene-text font-serif text-[18px] font-bold tracking-tight">
                 10-Minute Walk Reset
               </h3>
-              <ul className="text-serene-muted text-[13px] leading-relaxed mt-4 space-y-2.5">
+              <ul className="text-serene-muted text-sm leading-relaxed mt-4 space-y-3 font-light">
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">1</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">1</span>
                   <span>When overwhelmed, step outside for just 10 minutes.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">2</span>
-                  <span>Leave your phone behind if possible.</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">2</span>
+                  <span>Leave your phone behind if possible to avoid distraction.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">3</span>
-                  <span>Walk at a comfortable pace.</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">3</span>
+                  <span>Walk at a comfortable, conscious pace.</span>
                 </li>
                 <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">4</span>
-                  <span>Notice your surroundings — sounds, smells, textures.</span>
+                  <span className="text-serene-primary font-bold text-xs bg-serene-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 border border-serene-primary/20">4</span>
+                  <span>Notice your surroundings — sounds, breeze, smells, shapes.</span>
                 </li>
-                <li className="flex items-start gap-2.5">
-                  <span className="text-[#4A7C59] font-bold text-[12px] bg-[#4A7C59]/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0">5</span>
-                  <span>Return with a clearer, calmer mind.</span>
-                </li>
-                <li className="text-[12px] italic text-serene-muted pl-7 mt-1.5 leading-snug">
-                  Physical movement shifts your mental state.
+                <li className="text-xs italic text-serene-muted pl-7 mt-2 leading-snug">
+                  Physical displacement shifts visual context and resets cognitive overload.
                 </li>
               </ul>
             </div>
@@ -314,17 +321,17 @@ function ResourcesPage() {
       </section>
 
       {/* ── SECTION 4: FINDING SUPPORT ── */}
-      <section className="bg-serene-primarySoft py-16 px-6 md:px-12">
+      <section className="bg-serene-primarySoft/50 py-16 px-6 md:px-12 border-b border-serene-border/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-serif text-[22px] text-serene-text font-bold mb-[8px] text-center tracking-tight">
+          <h2 className="font-serif text-2xl text-serene-text font-bold mb-3 text-center tracking-tight">
             Finding Professional Support
           </h2>
-          <p className="text-serene-muted text-[14px] mb-[32px] text-center">
-            Affordable mental health support is available in India.
+          <p className="text-serene-muted text-sm mb-10 text-center font-light">
+            Affordable, licensed mental health support is available in India.
           </p>
 
-          <div className="bg-serene-surface/85 backdrop-blur-md border border-serene-border/45 rounded-2xl p-8 max-w-[640px] mx-auto shadow-sm transition-all duration-300 hover:shadow-md">
-            <p className="text-serene-text text-[14px] leading-relaxed">
+          <div className="bg-serene-surface border border-serene-border/30 rounded-[28px] p-8 max-w-[680px] mx-auto shadow-sm hover-lift">
+            <p className="text-serene-text text-sm leading-relaxed font-light">
               If you feel you need professional support, here are some steps to get started: First, speak with your college counsellor — most universities in India offer free counselling services. Second, visit your nearest government hospital — psychiatric services are available free of charge. Third, search for 'mental health counsellor near me' to find local practitioners. Fourth, consider online platforms like iCall (TISS) which offer affordable sessions starting at ₹300. Remember: seeking help is a sign of strength, not weakness. You deserve support.
             </p>
           </div>
@@ -332,10 +339,11 @@ function ResourcesPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-serene-bg py-[20px] px-[48px] text-sm border-t border-serene-border mt-auto">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="bg-serene-surface/90 py-16 text-sm border-t border-serene-border/30 mt-auto relative overflow-hidden">
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-serene-primary/10 to-transparent pointer-events-none opacity-40"></div>
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
           <div className="text-serene-muted text-xs">
-            © 2026 Serene. All wellness features are self-check templates.
+            © {new Date().getFullYear()} Serene. All wellness features are self-check templates.
           </div>
           <div className="flex items-center gap-6 text-xs text-serene-muted">
             <a
@@ -344,7 +352,7 @@ function ResourcesPage() {
                 e.preventDefault();
                 navigate("/safety");
               }}
-              className="hover:text-[#4A7C59] transition-colors"
+              className="hover:text-serene-primary font-medium transition-colors"
             >
               Safety
             </a>
@@ -354,10 +362,12 @@ function ResourcesPage() {
                 e.preventDefault();
                 navigate("/resources");
               }}
-              className="hover:text-[#4A7C59] transition-colors"
+              className="hover:text-serene-primary font-medium transition-colors"
             >
               Resources
             </a>
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); alert("Demo Privacy Policy: Serene processes all data locally on your device."); }} className="hover:text-serene-primary font-medium transition-colors">Privacy Policy</a>
+            <a href="/contact" onClick={(e) => { e.preventDefault(); alert("Contact: support@serene-demo.local"); }} className="hover:text-serene-primary font-medium transition-colors">Contact</a>
           </div>
         </div>
       </footer>
